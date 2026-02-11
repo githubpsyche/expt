@@ -47,9 +47,10 @@ expt/
         css/                jsPsych stylesheets
         plugins/            56 standard jsPsych plugins
   materials/
-    cfd/                    Chicago Face Database 3.0 (local copy for manifest generation, not committed)
+    cfd/                    Chicago Face Database 3.0 (resized to 400px for web; used by manifest + GitHub Pages)
   scripts/
-    generate_manifest.py    Scans CFD directory, produces experiment/stimuli.js
+    generate_manifest.py    Scans CFD directory, produces experiment/stimuli.js (--local for relative paths)
+    resize_images.py        Resizes CFD images to 400px display width
     generate_simulated_data.js  Generates simulated JSONL data for all conditions
     estimate_duration.js    Computes estimated experiment duration from config.js
     run_tests.js            Verification test suite (182 tests)
@@ -141,7 +142,7 @@ https://your-jatos-server.com/publix/123/start?batchId=456&condition=2&key_mappi
 
 **Prolific integration.** When recruiting via Prolific, the platform appends `PROLIFIC_PID`, `STUDY_ID`, and `SESSION_ID` to the study URL. These are read from URL parameters and stored on every trial, enabling participant-level data linkage.
 
-**Packaging.** To deploy, package the `experiment/` directory as a JATOS `.jzip` study. Face images are loaded from GitHub at runtime, so `materials/` is not needed in the package.
+**Packaging.** To deploy, package the `experiment/` directory as a JATOS `.jzip` study. With GitHub URLs in `stimuli.js` (the default), images are loaded from GitHub Pages at runtime, so `materials/` is not needed in the package. With `--local` paths, include `materials/` as well.
 
 ## Configurable parameters
 
@@ -207,7 +208,7 @@ python3 scripts/generate_manifest.py --local   # Relative local paths
 
 The script scans `materials/cfd/Images/CFD/`, parses model folders and expression filenames, and writes `experiment/stimuli.js` with entries for all models that have at least one usable expression (N, A, HC, or HO).
 
-By default, image paths are absolute URLs pointing to `githubpsyche/images2` on GitHub, which enables GitHub Pages demos and JATOS deployment without bundling image files. The `--local` flag generates relative paths (`materials/cfd/...`) for offline use.
+By default, image paths are absolute URLs pointing to this repo's GitHub Pages site, which enables demos and JATOS deployment without bundling image files. The `--local` flag generates relative paths (`materials/cfd/...`) for local serving.
 
 The manifest is a complete inventory of available expressions; the experiment selects which happy expression to use at runtime via `HAPPY_EXPRESSION` in config.js. The script prints a summary of model counts by race and gender.
 
@@ -227,7 +228,7 @@ The test suite ([`scripts/run_tests.js`](scripts/run_tests.js)) runs 182 tests c
 4. **Condition 2 (associative recognition)** — 60 intact + 60 rearranged, balanced by emotion x trial type, zero derangement fixed points, all 3 study factors preserved in rearranged trials, intact pairings match study
 5. **Condition 3 (valence rating)** — 120 test with `study_flanker_emotion`/`study_flanker_gender`, null `correct_response`, no practice test trials
 6. **Data field completeness** — every field specified in design decision 27 is present on every trial for each phase
-7. **Preload paths** — all image paths in the preload list resolve to actual files on disk
+7. **Preload paths** — all image paths in the preload list are valid (URL format or files on disk)
 
 ### Analysis pipeline tests (Python)
 

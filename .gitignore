@@ -184,7 +184,6 @@ cython_debug/
 data/simulated/
 
 # Images
-materials/cfd/Images
 .DS_Store
 
 # Extras

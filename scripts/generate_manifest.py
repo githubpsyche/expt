@@ -16,7 +16,7 @@ from pathlib import Path
 CFD_ROOT = Path(__file__).resolve().parent.parent / "materials" / "cfd" / "Images" / "CFD"
 OUTPUT = Path(__file__).resolve().parent.parent / "experiment" / "stimuli.js"
 
-IMAGE_BASE_URL = "https://raw.githubusercontent.com/githubpsyche/images2/main/cfd/Images/CFD/"
+IMAGE_BASE_URL = "https://githubpsyche.github.io/expt/materials/cfd/Images/CFD/"
 LOCAL_PATH_PREFIX = "materials/cfd/Images/CFD/"
 
 WANTED_EXPRESSIONS = {"N", "A", "HC", "HO"}
