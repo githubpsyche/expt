@@ -1,0 +1,29 @@
+/* Face-flanker experiment display styles */
+
+/* Three-face flanker display (study phase + associative recognition) */
+.flanker-display {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Single-face display (item recognition + valence rating) */
+.single-face-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Face image styling */
+.face-image {
+  height: auto;
+  object-fit: contain;
+}
+
+/* Fixation cross */
+.fixation-cross {
+  font-size: 40px;
+  font-weight: bold;
+}
+
