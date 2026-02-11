@@ -35,7 +35,7 @@ expt/
   experiment/
     index.html              Entry point — loads jsPsych, plugins, and experiment modules
     config.js               Experiment parameters (condition, timing, display, block sizes, keys)
-    stimuli.js              Generated stimulus manifest (597 CFD models with expression paths)
+    stimuli.js              Generated stimulus manifest (597 CFD models with image URLs)
     helpers.js              Utility functions (derangement, HTML generators)
     trials.js               Face allocation and trial generation (study + all 3 test phases)
     timeline.js             Timeline construction (instructions, practice, blocks, debrief)
@@ -47,7 +47,7 @@ expt/
         css/                jsPsych stylesheets
         plugins/            56 standard jsPsych plugins
   materials/
-    cfd/                    Chicago Face Database 3.0 (597 models, not committed)
+    cfd/                    Chicago Face Database 3.0 (local copy for manifest generation, not committed)
   scripts/
     generate_manifest.py    Scans CFD directory, produces experiment/stimuli.js
     generate_simulated_data.js  Generates simulated JSONL data for all conditions
@@ -112,6 +112,21 @@ The experiment runs in any modern browser but requires a local HTTP server — o
 
 3. When running outside JATOS, the experiment displays the collected data as JSON at the end.
 
+## Demoing on GitHub Pages
+
+The experiment can be hosted as a static site on GitHub Pages for live demos.
+
+1. Enable GitHub Pages for the repo (Settings → Pages), building from the root of the `main` branch.
+2. Ensure `.nojekyll` exists in the repo root (already present) so GitHub serves files directly.
+3. Ensure `stimuli.js` was generated with GitHub URLs (the default): `python3 scripts/generate_manifest.py`
+
+```
+https://githubpsyche.github.io/expt/experiment/index.html?condition=1
+https://githubpsyche.github.io/expt/experiment/index.html?condition=1&simulate=visual
+```
+
+The experiment runs entirely client-side, so no server configuration is needed beyond enabling Pages.
+
 ## JATOS deployment
 
 The experiment detects JATOS automatically via the `jatos.js` script. No code changes are needed — the same `index.html` works both locally and on JATOS.
@@ -126,7 +141,7 @@ https://your-jatos-server.com/publix/123/start?batchId=456&condition=2&key_mappi
 
 **Prolific integration.** When recruiting via Prolific, the platform appends `PROLIFIC_PID`, `STUDY_ID`, and `SESSION_ID` to the study URL. These are read from URL parameters and stored on every trial, enabling participant-level data linkage.
 
-**Packaging.** To deploy, package the `experiment/` and `materials/` directories as a JATOS `.jzip` study.
+**Packaging.** To deploy, package the `experiment/` directory as a JATOS `.jzip` study. Face images are loaded from GitHub at runtime, so `materials/` is not needed in the package.
 
 ## Configurable parameters
 
@@ -185,11 +200,16 @@ Both `test_mode` and `simulate` are recorded in the output data. These are for d
 
 If the CFD image directory changes (new images added or removed), regenerate the manifest:
 
-```
-python3 scripts/generate_manifest.py
+```bash
+python3 scripts/generate_manifest.py           # GitHub URLs (default)
+python3 scripts/generate_manifest.py --local   # Relative local paths
 ```
 
-This scans `materials/cfd/Images/CFD/`, parses model folders and expression filenames, and writes `experiment/stimuli.js` with entries for all models that have at least one usable expression (N, A, HC, or HO). The manifest is a complete inventory of available expressions; the experiment selects which happy expression to use at runtime via `HAPPY_EXPRESSION` in config.js. The script prints a summary of model counts by race and gender.
+The script scans `materials/cfd/Images/CFD/`, parses model folders and expression filenames, and writes `experiment/stimuli.js` with entries for all models that have at least one usable expression (N, A, HC, or HO).
+
+By default, image paths are absolute URLs pointing to `githubpsyche/images2` on GitHub, which enables GitHub Pages demos and JATOS deployment without bundling image files. The `--local` flag generates relative paths (`materials/cfd/...`) for offline use.
+
+The manifest is a complete inventory of available expressions; the experiment selects which happy expression to use at runtime via `HAPPY_EXPRESSION` in config.js. The script prints a summary of model counts by race and gender.
 
 ## Running tests
 

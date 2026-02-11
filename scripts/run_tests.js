@@ -114,15 +114,23 @@ assert(allHaveNeutral, 'All models have neutral expression');
 assertEqual(countExpr('F', ['A', 'B', 'L', 'W'], 'N'), 307, 'All-race neutral female');
 assertEqual(countExpr('M', ['A', 'B', 'L', 'W'], 'N'), 290, 'All-race neutral male');
 
-// File paths should be relative and point to real files
+// Image paths should be valid (local files or remote URLs)
 var sampleModel = STIMULI.find(function (s) { return s.model_id === 'BF-001'; });
 assert(!!sampleModel, 'BF-001 exists in manifest');
 if (sampleModel) {
-  var nPath = path.join(root, sampleModel.expressions.N);
-  assert(fs.existsSync(nPath), 'BF-001 neutral file exists on disk');
-  if (sampleModel.expressions.A) {
-    var aPath = path.join(root, sampleModel.expressions.A);
-    assert(fs.existsSync(aPath), 'BF-001 angry file exists on disk');
+  var isRemote = sampleModel.expressions.N.startsWith('http');
+  if (isRemote) {
+    assert(sampleModel.expressions.N.endsWith('.jpg'), 'BF-001 neutral path ends with .jpg');
+    if (sampleModel.expressions.A) {
+      assert(sampleModel.expressions.A.endsWith('.jpg'), 'BF-001 angry path ends with .jpg');
+    }
+  } else {
+    var nPath = path.join(root, sampleModel.expressions.N);
+    assert(fs.existsSync(nPath), 'BF-001 neutral file exists on disk');
+    if (sampleModel.expressions.A) {
+      var aPath = path.join(root, sampleModel.expressions.A);
+      assert(fs.existsSync(aPath), 'BF-001 angry file exists on disk');
+    }
   }
 }
 
@@ -416,22 +424,33 @@ section('7. Preload paths');
 
 // Condition 1 needs the most images (study + old targets + novel targets)
 assert(d1.preloadPaths.length > 0, 'Condition 1 has preload paths');
-// All paths should point to real files
-var missingFiles = 0;
-for (var i = 0; i < d1.preloadPaths.length; i++) {
-  if (!fs.existsSync(path.join(root, d1.preloadPaths[i]))) {
-    missingFiles++;
-    if (missingFiles <= 3) console.log('  Missing: ' + d1.preloadPaths[i]);
+// All paths should be valid (local files or remote URLs)
+var preloadIsRemote = d1.preloadPaths[0].startsWith('http');
+if (preloadIsRemote) {
+  var badUrls = d1.preloadPaths.filter(function (p) { return !p.endsWith('.jpg'); }).length;
+  assertEqual(badUrls, 0, 'All preload paths are valid image URLs (cond 1)');
+} else {
+  var missingFiles = 0;
+  for (var i = 0; i < d1.preloadPaths.length; i++) {
+    if (!fs.existsSync(path.join(root, d1.preloadPaths[i]))) {
+      missingFiles++;
+      if (missingFiles <= 3) console.log('  Missing: ' + d1.preloadPaths[i]);
+    }
   }
+  assertEqual(missingFiles, 0, 'All preload paths resolve to files on disk (cond 1)');
 }
-assertEqual(missingFiles, 0, 'All preload paths resolve to files on disk (cond 1)');
 
 // Condition 2 preload should include flanker images for test phase
 assert(d2.preloadPaths.length > 0, 'Condition 2 has preload paths');
-var missingFiles2 = d2.preloadPaths.filter(function (p) {
-  return !fs.existsSync(path.join(root, p));
-}).length;
-assertEqual(missingFiles2, 0, 'All preload paths resolve to files on disk (cond 2)');
+if (preloadIsRemote) {
+  var badUrls2 = d2.preloadPaths.filter(function (p) { return !p.endsWith('.jpg'); }).length;
+  assertEqual(badUrls2, 0, 'All preload paths are valid image URLs (cond 2)');
+} else {
+  var missingFiles2 = d2.preloadPaths.filter(function (p) {
+    return !fs.existsSync(path.join(root, p));
+  }).length;
+  assertEqual(missingFiles2, 0, 'All preload paths resolve to files on disk (cond 2)');
+}
 
 // ============================================================
 // Summary
