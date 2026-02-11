@@ -11,7 +11,7 @@ During the study phase, participants view a neutral face flanked on both sides b
 ### Design
 
 - Between-subjects: each participant completes one study phase and one of three test phases
-- Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (closed-mouth), and neutral expressions
+- Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (open-mouth), and neutral expressions
 - Flankers restricted to Black and White models to keep race constant across emotion conditions; targets and novel faces drawn from all races
 - Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
 - 10 replications of the 12-type design (120 study trials)
@@ -154,10 +154,10 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | `KEY_MAPPING` | random | 1 or 2; counterbalances all binary response keys; set via `?key_mapping=` or random |
 | `RESPONSE_KEY_LEFT` | `'z'` | Left response key for all binary tasks |
 | `RESPONSE_KEY_RIGHT` | `'m'` | Right response key for all binary tasks |
-| `HAPPY_EXPRESSION` | `'HC'` | `'HC'` (closed mouth) or `'HO'` (open mouth); single-knob switch |
+| `HAPPY_EXPRESSION` | `'HO'` | `'HC'` (closed mouth) or `'HO'` (open mouth); single-knob switch |
 | `FLANKER_RACES` | `['B', 'W']` | Race codes for flanker-eligible models |
 | `FLANKER_EMOTIONS` | `['angry', 'happy', 'neutral']` | Emotion conditions in the study phase |
-| `EMOTION_EXPR_MAP` | `{angry:'A', happy:HC, neutral:'N'}` | Maps emotion names to CFD expression codes |
+| `EMOTION_EXPR_MAP` | `{angry:'A', happy:HO, neutral:'N'}` | Maps emotion names to CFD expression codes |
 | `FIXATION_DURATION` | 2000 ms | Duration of fixation cross before each trial |
 | `RESPONSE_TIMEOUT` | 3000 ms | Study: fixed display duration; test: max response window |
 | `FACE_WIDTH` | 400 px | Display width of each face image |

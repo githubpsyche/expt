@@ -245,9 +245,9 @@ Targets and novel faces are always neutral and are not part of the emotion manip
 | Novel faces (item recog) | 60 | All races: remaining |
 | Practice | \~4-8 | Remaining |
 
-**25. Happy expression: HC (closed mouth)**
+**25. Happy expression: HO (open mouth)**
 
-The CFD provides two happy variants: HC (closed-mouth smile) and HO (open-mouth grin). HO is more intense and a closer match to the angry expression in arousal/salience. HC is more naturalistic. Researcher preference: HC.
+The CFD provides two happy variants: HC (closed-mouth smile) and HO (open-mouth grin). HO is more intense and a closer match to the angry expression in arousal/salience. HC is more naturalistic. Researcher preference: HO, to boost effect size via stronger arousal/salience match with angry expressions.
 
 ### Developer decisions (not specified in any source)
 
@@ -322,9 +322,9 @@ Exact value set once trial count is finalized.
 
 All flankers (angry, happy, and neutral) restricted to B/W models. Keeps race constant across emotion conditions, avoiding a race × emotion confound. Targets and novel faces have no race restriction. See stimulus constraints for the confound analysis and face budget.
 
-**25. Happy expression: HC (closed mouth)**
+**25. Happy expression: HO (open mouth)**
 
-HC (closed-mouth smile) chosen over HO (open-mouth grin). Researcher preference: HC is more naturalistic.
+HO (open-mouth grin) chosen over HC (closed-mouth smile). More intense and a closer arousal/salience match with angry expressions, boosting expected effect size.
 
 **26. Associative rearrangement: within trial type**
 
@@ -405,7 +405,7 @@ For factorial breakdown, also need: `target_gender` — present; `study_flanker_
 -   Between-subjects design: each participant completes one study phase + one of three test phases
 -   Single program; test phase determined by condition assignment
 -   Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0
--   Flanker emotions: angry (A expression), happy (HC closed-mouth expression), neutral (N expression)
+-   Flanker emotions: angry (A expression), happy (HO open-mouth expression), neutral (N expression)
 -   All flankers restricted to Black and White CFD models (race constant across emotion conditions); targets and novel faces from all races
 -   Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
 -   Study trial count must be a multiple of 12 (one per trial type per replication)
@@ -506,7 +506,7 @@ During the study phase, participants view a neutral face flanked on both sides b
 ### Design
 
 -   Between-subjects: each participant completes one study phase and one of three test phases
--   Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (closed-mouth), and neutral expressions
+-   Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (open-mouth), and neutral expressions
 -   Flankers restricted to Black and White models to keep race constant across emotion conditions; targets and novel faces drawn from all races
 -   Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
 -   10 replications of the 12-type design (120 study trials)

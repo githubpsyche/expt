@@ -20,7 +20,7 @@ var FACE_WIDTH   = 400; // width of each face image (study flanker display + tes
 var FACE_SPACING = 0;   // horizontal gap between faces in the 3-face flanker display
 
 // --- Stimulus decisions ---
-var HAPPY_EXPRESSION = 'HC';          // 'HC' (closed mouth) or 'HO' (open mouth)
+var HAPPY_EXPRESSION = 'HO';          // 'HC' (closed mouth) or 'HO' (open mouth)
 var FLANKER_RACES    = ['B', 'W'];    // race codes for flanker-eligible models
 var FLANKER_EMOTIONS = ['angry', 'happy', 'neutral'];
 var EMOTION_EXPR_MAP = {              // maps emotion names to CFD expression codes

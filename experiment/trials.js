@@ -99,7 +99,7 @@ function allocateTrials(condition) {
  * Filter STIMULI to models matching gender, race list, and having a given expression.
  * @param {string} gender - 'F' or 'M'
  * @param {string[]|null} races - array of race codes, or null for any race
- * @param {string} expr - expression key ('N', 'A', 'HC')
+ * @param {string} expr - expression key ('N', 'A', 'HO')
  * @returns {object[]} filtered models
  */
 function filterPool(gender, races, expr) {
