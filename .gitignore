@@ -183,6 +183,10 @@ cython_debug/
 # Generated data
 data/simulated/
 
+# Images
+materials/cfd/Images
+.DS_Store
+
 # Extras
 .vscode/
 .claude/
