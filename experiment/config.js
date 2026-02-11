@@ -40,6 +40,9 @@ var TEST_BLOCK_SIZE_ITEM_RECOG  = 40;  // 240 / 40 = 6 blocks
 var TEST_BLOCK_SIZE_ASSOC_RECOG = 40;  // 120 / 40 = 3 blocks
 var TEST_BLOCK_SIZE_VALENCE     = 40;  // 120 / 40 = 3 blocks
 
+// --- Study-phase response feedback ---
+var STUDY_RESPONSE_FEEDBACK = true;  // swap prompt to "Response recorded" after study-phase keypress
+
 // --- Practice ---
 var PRACTICE_ENABLED   = true;
 var N_PRACTICE_STUDY   = 4;

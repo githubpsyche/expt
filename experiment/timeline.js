@@ -196,6 +196,21 @@ function makeTrialNode(trialData, phase, condition, blockNum) {
     response_ends_trial: (phase !== 'study'),
     prompt: prompt,
     data: data,
+    on_load: function () {
+      if (phase !== 'study' || !STUDY_RESPONSE_FEEDBACK) return;
+      var stimDiv = document.getElementById('jspsych-html-keyboard-response-stimulus');
+      if (!stimDiv) return;
+      var promptEl = stimDiv.nextElementSibling;
+      if (!promptEl) return;
+      var done = false;
+      document.addEventListener('keydown', function handler(e) {
+        if (!done && choices.indexOf(e.key) !== -1) {
+          done = true;
+          promptEl.textContent = '\u2713 Response recorded';
+          document.removeEventListener('keydown', handler);
+        }
+      });
+    },
     on_finish: function (data) {
       data.timed_out = (data.response === null);
 

@@ -348,6 +348,10 @@ Study trials use a fixed stimulus display duration: the faces remain on screen f
 
 Test phases remain response-terminated (trial ends on keypress, 3s timeout). There is no encoding concern at test; response-terminated trials keep the pace comfortable and avoid dead time after responding.
 
+**29. Study-phase response feedback: prompt text swap**
+
+No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. After response, the key-mapping prompt (e.g., "female (Z) or male (M)?") is replaced with "✓ Response recorded." This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
+
 ### Research Questions and Output Fields
 
 Each test phase addresses a distinct question about how emotional flankers at study affect later memory for neutral target faces. Per-trial output fields (decision 27) are specified per question below. All trials share a common set: `condition`, `key_mapping`, `phase`, `block`, `trial_index`, `target_id`, `target_gender`, `target_race`, `target_filename`, `response`, `rt`, `timed_out`, `correct_response`, `correct`. The study phase additionally records: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`.

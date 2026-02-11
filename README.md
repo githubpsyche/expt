@@ -165,6 +165,7 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | `N_REPLICATIONS` | 10 | Replications of the 12-type factorial design |
 | `STUDY_BLOCK_SIZE` | 40 | Trials per study block (120 / 40 = 3 blocks) |
 | `TEST_BLOCK_SIZE_*` | 40 | Trials per test block (adjustable per condition) |
+| `STUDY_RESPONSE_FEEDBACK` | true | Show border on target face after study-phase keypress |
 | `PRACTICE_ENABLED` | true | Toggle practice trials on/off |
 | `N_PRACTICE_STUDY` | 4 | Number of practice study trials |
 | `N_PRACTICE_TEST` | 4 | Number of practice test trials |
