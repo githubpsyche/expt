@@ -16,7 +16,7 @@ var FIXATION_DURATION = 2000;   // fixation cross before each trial
 var RESPONSE_TIMEOUT  = 3000; // study: fixed display duration; test: max response window
 
 // --- Display (px) ---
-var FACE_WIDTH   = 400; // width of each face image (study flanker display + test single face)
+var FACE_WIDTH   = 200; // width of each face image (study flanker display + test single face)
 var FACE_SPACING = 0;   // horizontal gap between faces in the 3-face flanker display
 
 // --- Stimulus decisions ---

@@ -299,12 +299,11 @@ No additional interval mentioned by anyone.
 The fixation cross IS the inter-trial interval.
 Sequence: response -\> fixation (2000ms) -\> next stimulus.
 
-**20. Display size and spacing: configurable, determine during development**
+**20. Display size and spacing: 200px wide, 0px gap**
 
-No source specifies.
-Will be adjusted when we see the actual face stimuli.
-Default starting point: \~250px wide faces, \~50px gaps.
-Standard for face perception research.
+> "I think it would be good to reduce the size of the displays by about 1/2. The flankers are far from the target, measured center to center. They may be so far in the periphery that subjects won't recognise their gender or emotion. If we shrink the displays, we may be more likely to find effects." — Logan
+
+Initial implementation used 400px face width (matching the resized source image resolution). Reduced to 200px per Logan's recommendation to decrease flanker-target eccentricity and increase experimental sensitivity to flanker emotion effects. Source images remain 400px, providing 2x resolution for retina/HiDPI displays. Gap between faces is 0px, keeping flanker edges adjacent to the target edge.
 
 **21. 10 vs 20 replications: resolved — 10 reps (see decision 23)**
 
@@ -348,9 +347,9 @@ Study trials use a fixed stimulus display duration: the faces remain on screen f
 
 Test phases remain response-terminated (trial ends on keypress, 3s timeout). There is no encoding concern at test; response-terminated trials keep the pace comfortable and avoid dead time after responding.
 
-**29. Study-phase response feedback: prompt text swap**
+**29. Study-phase response feedback: border highlight**
 
-No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. After response, the key-mapping prompt (e.g., "female (Z) or male (M)?") is replaced with "✓ Response recorded." This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
+No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. A subtle gray outline appears on the center (target) face after response to confirm registration. This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
 
 ### Research Questions and Output Fields
 
@@ -480,8 +479,8 @@ Per-trial fields recorded by the experiment:
 | Number of replications | 10 | Locked; 20 not feasible (decision 23) |
 | Block size | TBD | Must divide phase total evenly |
 | Practice trials | on | Boolean; if on, 4-8 practice trials before study and test using non-experimental stimuli |
-| Face display width | \~250px | Adjusted during development |
-| Face spacing | \~50px | Adjusted during development |
+| Face display width | 200px | Reduced from 400px per Logan recommendation (decision 20) |
+| Face spacing | 0px | Flanker edges adjacent to target |
 
 ------------------------------------------------------------------------
 

@@ -160,7 +160,7 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | `EMOTION_EXPR_MAP` | `{angry:'A', happy:HO, neutral:'N'}` | Maps emotion names to CFD expression codes |
 | `FIXATION_DURATION` | 2000 ms | Duration of fixation cross before each trial |
 | `RESPONSE_TIMEOUT` | 3000 ms | Study: fixed display duration; test: max response window |
-| `FACE_WIDTH` | 400 px | Display width of each face image |
+| `FACE_WIDTH` | 200 px | Display width of each face image |
 | `FACE_SPACING` | 0 px | Gap between faces in the flanker display |
 | `N_REPLICATIONS` | 10 | Replications of the 12-type factorial design |
 | `STUDY_BLOCK_SIZE` | 40 | Trials per study block (120 / 40 = 3 blocks) |
