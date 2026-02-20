@@ -1,15 +1,8 @@
 // ============================================================
 // Experiment Configuration
-// Loaded after jsPsych init (uses jsPsych.data.getURLVariable)
+// Constants are set at load time; URL-dependent params are
+// deferred to initURLParams() (called after jatos.onLoad on JATOS).
 // ============================================================
-
-// --- Condition assignment ---
-// 1 = Item Recognition, 2 = Associative Recognition, 3 = Valence Rating
-var CONDITION = (function () {
-  var urlCondition = parseInt(jsPsych.data.getURLVariable('condition'));
-  if ([1, 2, 3].indexOf(urlCondition) !== -1) return urlCondition;
-  return null;
-})();
 
 // --- Timing (ms) ---
 var FIXATION_DURATION = 2000;   // fixation cross before each trial
@@ -52,49 +45,76 @@ var N_PRACTICE_TEST    = 4;
 var RESPONSE_KEY_LEFT  = 'z';
 var RESPONSE_KEY_RIGHT = 'm';
 
-// Key-mapping counterbalance (1 or 2), controls all binary tasks:
-//   1 = left=female/old/same, right=male/new/different
-//   2 = left=male/new/different, right=female/old/same
-var KEY_MAPPING = (function () {
-  var urlMapping = parseInt(jsPsych.data.getURLVariable('key_mapping'));
-  if ([1, 2].indexOf(urlMapping) !== -1) return urlMapping;
-  return Math.random() < 0.5 ? 1 : 2;
-})();
-
-var STUDY_KEYS = (KEY_MAPPING === 1)
-  ? { female: RESPONSE_KEY_LEFT,  male: RESPONSE_KEY_RIGHT }
-  : { female: RESPONSE_KEY_RIGHT, male: RESPONSE_KEY_LEFT };
-
-var ITEM_RECOG_KEYS = (KEY_MAPPING === 1)
-  ? { old: RESPONSE_KEY_LEFT,  new: RESPONSE_KEY_RIGHT }
-  : { old: RESPONSE_KEY_RIGHT, new: RESPONSE_KEY_LEFT };
-
-var ASSOC_RECOG_KEYS = (KEY_MAPPING === 1)
-  ? { same: RESPONSE_KEY_LEFT,  different: RESPONSE_KEY_RIGHT }
-  : { same: RESPONSE_KEY_RIGHT, different: RESPONSE_KEY_LEFT };
-
 var VALENCE_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-// --- Test mode (reduces timing, disables practice) ---
-var TEST_MODE = parseInt(jsPsych.data.getURLVariable('test_mode')) === 1;
+// ============================================================
+// URL-dependent parameters (populated by initURLParams)
+// ============================================================
 
-if (TEST_MODE) {
-  FIXATION_DURATION = 200;
-  RESPONSE_TIMEOUT  = 500;
-  PRACTICE_ENABLED  = false;
+// Declared here so they are globally visible; assigned in initURLParams().
+var CONDITION, KEY_MAPPING, TEST_MODE;
+var SUBJECT_ID, STUDY_ID, SESSION_ID;
+var STUDY_KEYS, ITEM_RECOG_KEYS, ASSOC_RECOG_KEYS;
+
+/**
+ * Read URL parameters and set up all URL-dependent config.
+ * Must be called after jsPsych init. On JATOS, call inside jatos.onLoad()
+ * so that jatos.urlQueryParameters is available.
+ */
+function initURLParams() {
+  // Helper: read from JATOS params if available, else jsPsych
+  function getParam(name) {
+    if (typeof jatos !== 'undefined' && jatos.urlQueryParameters &&
+        jatos.urlQueryParameters[name] !== undefined) {
+      return jatos.urlQueryParameters[name];
+    }
+    return jsPsych.data.getURLVariable(name);
+  }
+
+  // --- Condition assignment ---
+  // 1 = Item Recognition, 2 = Associative Recognition, 3 = Valence Rating
+  var urlCondition = parseInt(getParam('condition'));
+  CONDITION = ([1, 2, 3].indexOf(urlCondition) !== -1) ? urlCondition : null;
+
+  // --- Key-mapping counterbalance (1 or 2), controls all binary tasks ---
+  //   1 = left=female/old/same, right=male/new/different
+  //   2 = left=male/new/different, right=female/old/same
+  var urlMapping = parseInt(getParam('key_mapping'));
+  KEY_MAPPING = ([1, 2].indexOf(urlMapping) !== -1) ? urlMapping : (Math.random() < 0.5 ? 1 : 2);
+
+  STUDY_KEYS = (KEY_MAPPING === 1)
+    ? { female: RESPONSE_KEY_LEFT,  male: RESPONSE_KEY_RIGHT }
+    : { female: RESPONSE_KEY_RIGHT, male: RESPONSE_KEY_LEFT };
+
+  ITEM_RECOG_KEYS = (KEY_MAPPING === 1)
+    ? { old: RESPONSE_KEY_LEFT,  new: RESPONSE_KEY_RIGHT }
+    : { old: RESPONSE_KEY_RIGHT, new: RESPONSE_KEY_LEFT };
+
+  ASSOC_RECOG_KEYS = (KEY_MAPPING === 1)
+    ? { same: RESPONSE_KEY_LEFT,  different: RESPONSE_KEY_RIGHT }
+    : { same: RESPONSE_KEY_RIGHT, different: RESPONSE_KEY_LEFT };
+
+  // --- Test mode (reduces timing, disables practice) ---
+  TEST_MODE = parseInt(getParam('test_mode')) === 1;
+
+  if (TEST_MODE) {
+    FIXATION_DURATION = 200;
+    RESPONSE_TIMEOUT  = 500;
+    PRACTICE_ENABLED  = false;
+  }
+
+  // --- Prolific integration ---
+  SUBJECT_ID = getParam('PROLIFIC_PID') || '';
+  STUDY_ID   = getParam('STUDY_ID') || '';
+  SESSION_ID = getParam('SESSION_ID') || '';
+
+  // --- Add global properties to all trial data ---
+  jsPsych.data.addProperties({
+    condition:   CONDITION,
+    key_mapping: KEY_MAPPING,
+    test_mode:   TEST_MODE,
+    subject_id:  SUBJECT_ID,
+    study_id:    STUDY_ID,
+    session_id:  SESSION_ID
+  });
 }
-
-// --- Prolific integration ---
-var SUBJECT_ID = jsPsych.data.getURLVariable('PROLIFIC_PID') || '';
-var STUDY_ID   = jsPsych.data.getURLVariable('STUDY_ID') || '';
-var SESSION_ID = jsPsych.data.getURLVariable('SESSION_ID') || '';
-
-// --- Add global properties to all trial data ---
-jsPsych.data.addProperties({
-  condition:   CONDITION,
-  key_mapping: KEY_MAPPING,
-  test_mode:   TEST_MODE,
-  subject_id:  SUBJECT_ID,
-  study_id:    STUDY_ID,
-  session_id:  SESSION_ID
-});

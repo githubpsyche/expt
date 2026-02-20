@@ -337,7 +337,7 @@ Study phase adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emoti
 
 Item recognition adds: `stimulus_type` (old/new), `study_flanker_emotion`, `study_flanker_gender`.
 
-Associative recognition adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `trial_type` (intact/rearranged).
+Associative recognition adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `pair_type` (intact/rearranged).
 
 Valence rating adds: `study_flanker_emotion`, `study_flanker_gender`, `rating` (1-9).
 
@@ -347,9 +347,9 @@ Study trials use a fixed stimulus display duration: the faces remain on screen f
 
 Test phases remain response-terminated (trial ends on keypress, 3s timeout). There is no encoding concern at test; response-terminated trials keep the pace comfortable and avoid dead time after responding.
 
-**29. Study-phase response feedback: border highlight**
+**29. Study-phase response feedback: prompt text swap**
 
-No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. A subtle gray outline appears on the center (target) face after response to confirm registration. This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
+No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. After a valid keypress, the prompt text below the faces changes to "Response recorded" to confirm registration. This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
 
 ### Research Questions and Output Fields
 
@@ -376,14 +376,14 @@ For a fuller factorial analysis (target gender × flanker gender × flanker emot
 
 > "Emma's goal here is to see whether items are bound more strongly to emotional contexts than to neutral ones." — Logan, email 2
 
-The design addresses this by presenting studied target-flanker pairings at test, half intact and half rearranged within trial type (decision 26). Additional phase-specific fields: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `trial_type` (intact/rearranged).
+The design addresses this by presenting studied target-flanker pairings at test, half intact and half rearranged within trial type (decision 26). Additional phase-specific fields: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `pair_type` (intact/rearranged).
 
 Analysis: Signal detection per flanker emotion condition.
 
-- **Hit rate**: Filter `trial_type="intact"`, group by `flanker_emotion` → proportion responding "same"
-- **False alarm rate**: Filter `trial_type="rearranged"`, group by `flanker_emotion` → proportion responding "same"
+- **Hit rate**: Filter `pair_type="intact"`, group by `flanker_emotion` → proportion responding "same"
+- **False alarm rate**: Filter `pair_type="rearranged"`, group by `flanker_emotion` → proportion responding "same"
 - **d' per emotion**: Hit rate vs. false alarm rate within each emotion condition
-- **Fields used**: `trial_type`, `flanker_emotion`, `response`, `correct`
+- **Fields used**: `pair_type`, `flanker_emotion`, `response`, `correct`
 
 Factorial breakdown by `target_gender` × `flanker_gender` also possible using existing fields. No missing fields — all three factors (`target_gender`, `flanker_gender`, `flanker_emotion`) are directly present in the test data because the flanker is shown at test.
 
@@ -468,7 +468,7 @@ Per-trial fields recorded by the experiment:
 -   **All trials**: `condition`, `phase`, `block`, `trial_index`, `target_id`, `target_gender`, `target_race`, `target_filename`, `response`, `rt`, `timed_out`, `correct_response`, `correct`
 -   **Study** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`
 -   **Item recognition** adds: `stimulus_type`, `study_flanker_emotion`, `study_flanker_gender`
--   **Associative recognition** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `trial_type`
+-   **Associative recognition** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `pair_type`
 -   **Valence rating** adds: `study_flanker_emotion`, `study_flanker_gender`, `rating`
 
 ### Configurable Parameters

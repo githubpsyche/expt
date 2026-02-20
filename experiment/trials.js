@@ -262,7 +262,7 @@ function buildAssocRecogTrials(studyTrials) {
         flanker_race:     st.flanker_race,
         flanker_emotion:  st.flanker_emotion,
         flanker_filename: st.flanker_filename,
-        trial_type:       'intact',
+        pair_type:       'intact',
         correct_response: ASSOC_RECOG_KEYS.same
       });
     }
@@ -282,7 +282,7 @@ function buildAssocRecogTrials(studyTrials) {
         flanker_race:     donor.flanker_race,
         flanker_emotion:  donor.flanker_emotion,
         flanker_filename: donor.flanker_filename,
-        trial_type:       'rearranged',
+        pair_type:       'rearranged',
         correct_response: ASSOC_RECOG_KEYS.different
       });
     }
@@ -377,7 +377,7 @@ function buildPracticeTestTrials(practiceTargets, condition) {
         flanker_race:     null,
         flanker_emotion:  'neutral',
         flanker_filename: null,
-        trial_type:       'intact',
+        pair_type:       'intact',
         correct_response: ASSOC_RECOG_KEYS.same
       });
     }

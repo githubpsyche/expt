@@ -40,7 +40,7 @@
     window.jsPsych = initializeExperiment();
 </script>
 
-<!-- Config must load after jsPsych init (uses jsPsych.data.getURLVariable) -->
+<!-- Config (constants load immediately; URL params deferred to initURLParams) -->
 <script src="experiment/config.js"></script>
 
 <!-- Trial generation and timeline construction -->
@@ -49,21 +49,31 @@
 
 <!-- Main entry point -->
 <script>
-    if (CONDITION === null) {
-        document.body.innerHTML =
-            '<h2>Configuration Error</h2>' +
-            '<p>No condition was assigned. The URL must include a <code>condition</code> ' +
-            'parameter (1, 2, or 3).</p>' +
-            '<p>Example: <code>?condition=1</code></p>';
-    } else {
-        var trialData = allocateTrials(CONDITION);
-        var timeline = buildTimeline(jsPsych, trialData, CONDITION);
-        var simulateMode = jsPsych.data.getURLVariable('simulate');
-        if (simulateMode === 'visual' || simulateMode === 'data-only') {
-            jsPsych.simulate(timeline, simulateMode);
+    function startExperiment() {
+        initURLParams();
+
+        if (CONDITION === null) {
+            document.body.innerHTML =
+                '<h2>Configuration Error</h2>' +
+                '<p>No condition was assigned. The URL must include a <code>condition</code> ' +
+                'parameter (1, 2, or 3).</p>' +
+                '<p>Example: <code>?condition=1</code></p>';
         } else {
-            jsPsych.run(timeline);
+            var trialData = allocateTrials(CONDITION);
+            var timeline = buildTimeline(jsPsych, trialData, CONDITION);
+            var simulateMode = jsPsych.data.getURLVariable('simulate');
+            if (simulateMode === 'visual' || simulateMode === 'data-only') {
+                jsPsych.simulate(timeline, simulateMode);
+            } else {
+                jsPsych.run(timeline);
+            }
         }
+    }
+
+    if (typeof jatos !== 'undefined') {
+        jatos.onLoad(startExperiment);
+    } else {
+        startExperiment();
     }
 </script>
 </html>
