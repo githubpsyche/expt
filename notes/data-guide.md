@@ -75,7 +75,3 @@ All flankers are restricted to Black and White models from the Chicago Face Data
 ### Rearrangement in condition 2
 
 Rearranged test trials in condition 2 preserve all three study-phase factors (target gender, flanker gender, flanker emotion). Only the specific identity pairing changes — a target is shown with a different flanker from the same trial type. This ensures that the only cue distinguishing intact from rearranged is memory for the specific face pairing, not a category-level mismatch.
-
-## Analysis
-
-For analysis specifications, interpretation guidance, and statistical inference plans, see [analysis-guide.md](analysis-guide.md).
