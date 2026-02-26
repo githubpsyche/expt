@@ -222,11 +222,11 @@ The stimulus set is the Chicago Face Database (CFD) 3.0, containing 597 models a
 
 B/W totals: 194 female (84 angry, 85 HC), 186 male (70 angry, 68 HC). All 597 models have neutral (N).
 
-**23. Replications: locked to 10 (120 study trials)**
+**23. Replications: reduced to 5 (60 study trials)**
 
-Resolves decision 21. For 10 reps, the experiment needs 360 unique faces (180 per gender): 60 flankers + 60 targets + 60 novel faces. Available: 307 female, 290 male — feasible with margin.
+Resolves decision 21. Originally set to 10 reps (360 unique faces needed, feasible). 20 reps not feasible (720 faces needed, only 290 males available).
 
-For 20 reps, the experiment would need 720 unique faces (360 per gender). Only 290 males available — not feasible. CFD-INDIA (142 models) and CFD-MR (88 models) have neutral expressions only and cannot supplement the emotional expression shortfall.
+Reduced to 5 reps after 39-subject pilot showed overall d' near floor (~0.3), leaving no room for emotion effects. See decision 31 for rationale and downstream implications.
 
 **24. Flanker race: restricted to Black and White models**
 
@@ -234,15 +234,15 @@ Since only B/W models have angry and happy expressions, all emotional flankers a
 
 Targets and novel faces are always neutral and are not part of the emotion manipulation. Their race is a nuisance variable balanced across conditions by random assignment. No race restriction on targets or novels.
 
-**Face budget per gender for 10 reps:**
+**Face budget per gender for 5 reps:**
 
 | Role | Count | Pool |
 |---|---|---|
-| Flankers (angry) | 20 | B/W: 84F / 70M |
-| Flankers (happy) | 20 | B/W: 85F / 68M |
-| Flankers (neutral) | 20 | B/W: 194F / 186M |
-| Targets | 60 | All races: 307F / 290M |
-| Novel faces (item recog) | 60 | All races: remaining |
+| Flankers (angry) | 10 | B/W: 84F / 70M |
+| Flankers (happy) | 10 | B/W: 85F / 68M |
+| Flankers (neutral) | 10 | B/W: 194F / 186M |
+| Targets | 30 | All races: 307F / 290M |
+| Novel faces (item recog) | 30 | All races: remaining |
 | Practice | \~4-8 | Remaining |
 
 **25. Happy expression: HO (open mouth)**
@@ -273,11 +273,15 @@ Feedback is optional but given the silence from all sources, omit it.
 On timeout (3s expires): silent advance to next trial (fixation cross).
 No "too slow" message.
 
-**16. Response key counterbalancing: study-phase gender mapping only**
+**16. Response key counterbalancing: all binary tasks**
 
-No source mentions counterbalancing. Emma specifies fixed mappings (Z=old/same, M=new/different) for test phases.
-Test-phase keys are not counterbalanced: no mnemonic overlap between key letters and response labels.
-Study-phase gender mapping IS counterbalanced: M=male creates an asymmetric stimulus-response compatibility effect. Half of participants get Z=female/M=male, the other half get Z=male/M=female. Assigned via URL parameter (`key_mapping=1|2`), JATOS JSON input, or random 50/50 fallback. Recorded in data as `key_mapping`.
+No source mentions counterbalancing. Emma specifies fixed mappings (Z=old/same, M=new/different) for test phases, but counterbalancing all binary response keys is standard practice and was implemented for all tasks.
+
+A single `KEY_MAPPING` variable (1 or 2) controls all binary key assignments:
+- **Key mapping 1**: Z=female/old/same, M=male/new/different
+- **Key mapping 2**: Z=male/new/different, M=female/old/same
+
+This counterbalances study-phase gender mapping (M=male creates an asymmetric SRC effect) and test-phase recognition keys alike. Assigned via URL parameter (`key_mapping=1|2`), JATOS JSON input, or random 50/50 fallback. Recorded in data as `key_mapping`.
 
 **17. Study phase response keys: Z and M, counterbalanced**
 
@@ -299,11 +303,19 @@ No additional interval mentioned by anyone.
 The fixation cross IS the inter-trial interval.
 Sequence: response -\> fixation (2000ms) -\> next stimulus.
 
-**20. Display size and spacing: 200px wide, 0px gap**
+**20. Display size and spacing: 100px wide, 0px gap**
 
 > "I think it would be good to reduce the size of the displays by about 1/2. The flankers are far from the target, measured center to center. They may be so far in the periphery that subjects won't recognise their gender or emotion. If we shrink the displays, we may be more likely to find effects." — Logan
 
 Initial implementation used 400px face width (matching the resized source image resolution). Reduced to 200px per Logan's recommendation to decrease flanker-target eccentricity and increase experimental sensitivity to flanker emotion effects. Source images remain 400px, providing 2x resolution for retina/HiDPI displays. Gap between faces is 0px, keeping flanker edges adjacent to the target edge.
+
+After the 39-subject pilot showed a null gender compatibility effect (RT = 994 ms compatible vs. 996 ms incompatible), Logan recommended further reduction:
+
+> "We should look closer at the flanker displays. The key flanker result in the study phase is the effect of same vs. different gender flankers. This effect is null (RT = 994 ms for compatible, 996 ms for incompatible; accuracy = .9672 for compatible, .9656 for incomptible). It's possible that the flankers are too far from the target to have much influence. The whole display could be too large. We could try smaller displays as well." — Logan
+>
+> "The smaller display is a good idea. In the original Eriksen and Eriksen (1974) flanker study, the compatibility effect got smaller as the distance between the target and the flankers increased from .0625 to .5 to 1.0 degrees of visual angle." — Logan
+
+Further reduced from 200px to 100px per this feedback. Source images remain 400px, now providing 4x resolution.
 
 **21. 10 vs 20 replications: resolved — 10 reps (see decision 23)**
 
@@ -350,6 +362,22 @@ Test phases remain response-terminated (trial ends on keypress, 3s timeout). The
 **29. Study-phase response feedback: prompt text swap**
 
 No source specifies response feedback during study. Because the study phase uses a fixed 3-second display (decision 28), participants receive no visual indication that their keypress was registered. After a valid keypress, the prompt text below the faces changes to "Response recorded" to confirm registration. This is a registration cue only — no accuracy information is provided (consistent with decision 15). Controlled by `STUDY_RESPONSE_FEEDBACK` in config.js; default on.
+
+**30. Dark background**
+
+Dark gray background (`#333`) with light text (`#eee`) and white fixation cross (`#fff`). Standard practice in face perception experiments — reduces glare, minimizes screen luminance contrast with face stimuli, and better approximates lab viewing conditions. Implemented via `experiment/flanker.css` overrides on jsPsych defaults. Buttons and progress bar retain their own light backgrounds from jsPsych CSS.
+
+**31. Study list reduction: 120 → 60 trials (10 → 5 replications)**
+
+> "For now, I think we should focus on Experiment 1 and see if we can get the item recognition task working. I think the problem may be that there are too many faces to remember. We now have 120 orienting (flanker task) trials in Experiment 1, which means 240 test trials. We could cut the number of orienting trials down to 60 or even 36. [...] If we reduced that to 5 replications, we would have 60 trials. [...] If we went to 36 orienting trials, I think we'd have too few trials to get stable data." — Logan
+
+Reduced `N_REPLICATIONS` from 10 to 5 and `STUDY_BLOCK_SIZE` from 40 to 30 (60 / 30 = 2 blocks). The 39-subject pilot showed d' ≈ 0.3 across all three emotion conditions — near floor with no room for emotion modulation. Halving the study list should improve overall recognition accuracy, making the experiment sensitive to any emotion effect that exists.
+
+**Downstream effects by condition:**
+
+- **Condition 1 (item recognition)**: 60 old + 60 new = 120 test trials, 20 old per emotion. Sufficient for per-emotion d' with standard edge correction.
+- **Condition 2 (associative recognition)**: 60 study → 30 intact + 30 rearranged. Per trial type (12 types, 5 reps): only 2-3 per split. `derangement(2)` is a trivial swap; `derangement(3)` has only 2 possible permutations. **Rearrangement logic needs rework before condition 2 can be piloted.** Additionally, `TEST_BLOCK_SIZE_ASSOC_RECOG` (40) does not divide 60 evenly.
+- **Condition 3 (valence)**: 60 study → 60 test → 20 ratings per emotion. Workable for mean ratings. `TEST_BLOCK_SIZE_VALENCE` (40) does not divide 60 evenly.
 
 ### Research Questions and Output Fields
 
@@ -412,7 +440,7 @@ For factorial breakdown, also need: `target_gender` — present; `study_flanker_
 -   All flankers restricted to Black and White CFD models (race constant across emotion conditions); targets and novel faces from all races
 -   Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
 -   Study trial count must be a multiple of 12 (one per trial type per replication)
--   10 replications (120 study trials)
+-   5 replications (60 study trials; reduced from 10 per decision 31)
 -   No face identity is used more than once across the entire experiment (each trial uses unique individuals)
 
 ### Research Questions
@@ -476,27 +504,27 @@ Per-trial fields recorded by the experiment:
 | Parameter | Default | Notes |
 |-----------------------------|------------------------|-------------------|
 | Experiment condition | — | 1 (item recog), 2 (assoc recog), or 3 (valence) |
-| Number of replications | 10 | Locked; 20 not feasible (decision 23) |
-| Block size | TBD | Must divide phase total evenly |
+| Number of replications | 5 | Reduced from 10 per decision 31; 20 not feasible (decision 23) |
+| Study block size | 30 | 60 / 30 = 2 blocks |
 | Practice trials | on | Boolean; if on, 4-8 practice trials before study and test using non-experimental stimuli |
-| Face display width | 200px | Reduced from 400px per Logan recommendation (decision 20) |
+| Face display width | 100px | Reduced from 400px → 200px → 100px per Logan feedback (decision 20) |
 | Face spacing | 0px | Flanker edges adjacent to target |
 
 ------------------------------------------------------------------------
 
 ## Trial Count Summary
 
-10 replications of the 12-type factorial design (decision 23). Derived from Logan email 1: "We need two unique pictures for each trial, one for the target and one that is repeated as the flankers."
+5 replications of the 12-type factorial design (decisions 23, 31). Derived from Logan email 1: "We need two unique pictures for each trial, one for the target and one that is repeated as the flankers."
 
 | | Count |
 |----|-----|
-| Study trials | 120 |
-| Unique study faces | 240 (120 targets + 120 flankers) |
-| Item Recog test trials | 240 (120 old + 120 new) |
-| Additional novel faces needed | 120 |
-| Assoc Recog test trials | 120 (60 intact + 60 rearranged) |
-| Valence test trials | 120 |
-| **Total unique faces needed** | **360** |
+| Study trials | 60 |
+| Unique study faces | 120 (60 targets + 60 flankers) |
+| Item Recog test trials | 120 (60 old + 60 new) |
+| Additional novel faces needed | 60 |
+| Assoc Recog test trials | 60 (30 intact + 30 rearranged) |
+| Valence test trials | 60 |
+| **Total unique faces needed** | **180** |
 
 ------------------------------------------------------------------------
 
@@ -512,7 +540,7 @@ During the study phase, participants view a neutral face flanked on both sides b
 -   Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (open-mouth), and neutral expressions
 -   Flankers restricted to Black and White models to keep race constant across emotion conditions; targets and novel faces drawn from all races
 -   Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
--   10 replications of the 12-type design (120 study trials)
+-   5 replications of the 12-type design (60 study trials)
 -   No face identity is used more than once across the entire experiment
 
 ### Procedure
@@ -531,9 +559,9 @@ Each trial begins with a fixation cross (2000 ms), followed by the stimulus disp
 
 | | Count |
 |----|-----|
-| Study trials | 120 |
-| Unique study faces | 240 (120 targets + 120 flankers) |
-| Item recognition test trials | 240 (120 old + 120 new) |
-| Associative recognition test trials | 120 (60 intact + 60 rearranged) |
-| Valence rating test trials | 120 |
-| **Total unique faces needed** | **360** |
+| Study trials | 60 |
+| Unique study faces | 120 (60 targets + 60 flankers) |
+| Item recognition test trials | 120 (60 old + 60 new) |
+| Associative recognition test trials | 60 (30 intact + 30 rearranged) |
+| Valence rating test trials | 60 |
+| **Total unique faces needed** | **180** |

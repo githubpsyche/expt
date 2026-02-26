@@ -9,7 +9,7 @@ var FIXATION_DURATION = 2000;   // fixation cross before each trial
 var RESPONSE_TIMEOUT  = 3000; // study: fixed display duration; test: max response window
 
 // --- Display (px) ---
-var FACE_WIDTH   = 200; // width of each face image (study flanker display + test single face)
+var FACE_WIDTH   = 100; // width of each face image (study flanker display + test single face)
 var FACE_SPACING = 0;   // horizontal gap between faces in the 3-face flanker display
 
 // --- Stimulus decisions ---
@@ -23,12 +23,12 @@ var EMOTION_EXPR_MAP = {              // maps emotion names to CFD expression co
 };
 
 // --- Study phase ---
-var N_REPLICATIONS  = 10;  // repetitions per trial type (each uses a unique face pair)
+var N_REPLICATIONS  = 5;   // repetitions per trial type (each uses a unique face pair)
 var N_TRIAL_TYPES   = 12;  // 2 target genders x 2 flanker genders x 3 flanker emotions
 var N_STUDY_TRIALS  = N_REPLICATIONS * N_TRIAL_TYPES;  // 120
 
 // --- Block sizes (must divide phase totals evenly) ---
-var STUDY_BLOCK_SIZE            = 40;  // 120 / 40 = 3 blocks
+var STUDY_BLOCK_SIZE            = 30;  // 60 / 30 = 2 blocks
 var TEST_BLOCK_SIZE_ITEM_RECOG  = 40;  // 240 / 40 = 6 blocks
 var TEST_BLOCK_SIZE_ASSOC_RECOG = 40;  // 120 / 40 = 3 blocks
 var TEST_BLOCK_SIZE_VALENCE     = 40;  // 120 / 40 = 3 blocks

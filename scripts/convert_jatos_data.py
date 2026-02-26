@@ -6,7 +6,7 @@ Produces two files:
   - Full CSV (all fields, for audit/validation)
 
 Usage:
-    python scripts/convert_jatos_data.py data/jatos_results_data_20260220121216.jsonl
+    python scripts/convert_jatos_data.py data/2026_02_20_pilot_39subj.jsonl --output data/2026_02_20_pilot_39subj.csv
     python scripts/convert_jatos_data.py data/file.jsonl --output data/custom.csv
 """
 

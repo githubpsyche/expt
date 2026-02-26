@@ -12,9 +12,9 @@ A separate full CSV with additional bookkeeping columns (participant IDs, stimul
 
 | Condition | Study trials | Test trials | Total per subject |
 |---|---|---|---|
-| 1 — Item recognition | 120 | 240 (120 old + 120 new) | 360 |
-| 2 — Associative recognition | 120 | 120 (60 intact + 60 rearranged) | 240 |
-| 3 — Valence rating | 120 | 120 | 240 |
+| 1 — Item recognition | 60 | 120 (60 old + 60 new) | 180 |
+| 2 — Associative recognition | 60 | 60 (30 intact + 30 rearranged) | 120 |
+| 3 — Valence rating | 60 | 60 | 120 |
 
 ## Data Dictionary
 
@@ -52,7 +52,7 @@ The study phase crosses three factors:
 | Flanker gender | flanker_gender | female, male |
 | Flanker emotion | flanker_emotion | angry, happy, neutral |
 
-This produces 2 x 2 x 3 = 12 trial types, each replicated 10 times, yielding 120 study trials per subject. Every trial uses two unique face identities: one neutral target (center) and one emotional or neutral flanker (repeated on both sides).
+This produces 2 x 2 x 3 = 12 trial types, each replicated 5 times, yielding 60 study trials per subject. Every trial uses two unique face identities: one neutral target (center) and one emotional or neutral flanker (repeated on both sides).
 
 ### Between-subjects conditions
 

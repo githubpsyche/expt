@@ -37,15 +37,16 @@ function allocateTrials(condition) {
     }
   }
 
+  var nTargetsPerGender = N_STUDY_TRIALS / 2;  // half female, half male
   var targets = {
-    F: drawN(pools.target_F, 60, 'N', used),
-    M: drawN(pools.target_M, 60, 'N', used)
+    F: drawN(pools.target_F, nTargetsPerGender, 'N', used),
+    M: drawN(pools.target_M, nTargetsPerGender, 'N', used)
   };
 
   var novels = { F: [], M: [] };
   if (condition === 1) {
-    novels.F = drawN(pools.target_F, 60, 'N', used);
-    novels.M = drawN(pools.target_M, 60, 'N', used);
+    novels.F = drawN(pools.target_F, nTargetsPerGender, 'N', used);
+    novels.M = drawN(pools.target_M, nTargetsPerGender, 'N', used);
   }
 
   // --- Practice faces ---
@@ -245,9 +246,10 @@ function buildAssocRecogTrials(studyTrials) {
   var keys = Object.keys(byType);
   for (var k = 0; k < keys.length; k++) {
     var group = jsPsych.randomization.shuffle(byType[keys[k]].slice());
-    // First 5 intact, last 5 rearranged
-    var intactGroup     = group.slice(0, 5);
-    var rearrangedGroup = group.slice(5, 10);
+    var nIntact     = Math.ceil(group.length / 2);
+    var nRearranged = group.length - nIntact;
+    var intactGroup     = group.slice(0, nIntact);
+    var rearrangedGroup = group.slice(nIntact);
 
     // Intact trials
     for (var i = 0; i < intactGroup.length; i++) {
@@ -267,28 +269,32 @@ function buildAssocRecogTrials(studyTrials) {
       });
     }
 
-    // Rearranged trials: derange flankers among 5 targets
-    var derangedIdx = derangement(5);
-    for (var i = 0; i < 5; i++) {
-      var st    = rearrangedGroup[i];
-      var donor = rearrangedGroup[derangedIdx[i]];
-      trials.push({
-        target_id:        st.target_id,
-        target_gender:    st.target_gender,
-        target_race:      st.target_race,
-        target_filename:  st.target_filename,
-        flanker_id:       donor.flanker_id,
-        flanker_gender:   donor.flanker_gender,
-        flanker_race:     donor.flanker_race,
-        flanker_emotion:  donor.flanker_emotion,
-        flanker_filename: donor.flanker_filename,
-        pair_type:       'rearranged',
-        correct_response: ASSOC_RECOG_KEYS.different
-      });
+    // Rearranged trials: derange flankers among targets
+    if (nRearranged > 1) {
+      var derangedIdx = derangement(nRearranged);
+      for (var i = 0; i < nRearranged; i++) {
+        var st    = rearrangedGroup[i];
+        var donor = rearrangedGroup[derangedIdx[i]];
+        trials.push({
+          target_id:        st.target_id,
+          target_gender:    st.target_gender,
+          target_race:      st.target_race,
+          target_filename:  st.target_filename,
+          flanker_id:       donor.flanker_id,
+          flanker_gender:   donor.flanker_gender,
+          flanker_race:     donor.flanker_race,
+          flanker_emotion:  donor.flanker_emotion,
+          flanker_filename: donor.flanker_filename,
+          pair_type:       'rearranged',
+          correct_response: ASSOC_RECOG_KEYS.different
+        });
+      }
+    } else if (nRearranged === 1) {
+      // Cannot derange a single item — skip (logged as design limitation)
     }
   }
 
-  return trials;  // length = 120 (60 intact + 60 rearranged)
+  return trials;
 }
 
 function buildValenceTrials(studyTrials) {

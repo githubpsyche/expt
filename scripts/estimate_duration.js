@@ -41,9 +41,9 @@ var INSTRUCTION_SCREEN_MS = 15000;  // ~15s to read instructions and click Begin
 var REST_BREAK_MS = 8000;           // ~8s average rest break
 var PRACTICE_NOTICE_MS = 5000;      // practice start + end notices
 
-// Trial counts
-var N_STUDY = N_STUDY_TRIALS;       // 120
-var N_TEST = { 1: 240, 2: 120, 3: 120 };
+// Trial counts (derived from config)
+var N_STUDY = N_STUDY_TRIALS;
+var N_TEST = { 1: N_STUDY * 2, 2: N_STUDY, 3: N_STUDY };
 
 // Block counts (rest breaks = blocks - 1)
 var studyBlocks = N_STUDY / STUDY_BLOCK_SIZE;

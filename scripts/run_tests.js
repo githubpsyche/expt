@@ -67,6 +67,10 @@ var root = path.resolve(__dirname, '..');
 eval(fs.readFileSync(path.join(root, 'experiment/stimuli.js'), 'utf8').replace('const STIMULI', 'var STIMULI'));
 eval(fs.readFileSync(path.join(root, 'experiment/helpers.js'), 'utf8'));
 eval(fs.readFileSync(path.join(root, 'experiment/config.js'), 'utf8'));
+
+// Initialize URL-dependent config (sets KEY_MAPPING and derived key mappings)
+initURLParams();
+
 eval(fs.readFileSync(path.join(root, 'experiment/trials.js'), 'utf8'));
 
 // ============================================================
@@ -214,21 +218,21 @@ section('3. Condition 1 — Item Recognition');
 CONDITION = 1;
 var d1 = allocateTrials(1);
 
-assertEqual(d1.studyTrials.length, 120, 'Study trials = 120');
-assertEqual(d1.testTrials.length,  240, 'Test trials = 240');
+assertEqual(d1.studyTrials.length, N_STUDY_TRIALS, 'Study trials = ' + N_STUDY_TRIALS);
+assertEqual(d1.testTrials.length,  N_STUDY_TRIALS * 2, 'Test trials = ' + (N_STUDY_TRIALS * 2));
 
 var oldTrials = d1.testTrials.filter(function (t) { return t.stimulus_type === 'old'; });
 var newTrials = d1.testTrials.filter(function (t) { return t.stimulus_type === 'new'; });
-assertEqual(oldTrials.length, 120, 'Old test trials = 120');
-assertEqual(newTrials.length, 120, 'New test trials = 120');
+assertEqual(oldTrials.length, N_STUDY_TRIALS, 'Old test trials = ' + N_STUDY_TRIALS);
+assertEqual(newTrials.length, N_STUDY_TRIALS, 'New test trials = ' + N_STUDY_TRIALS);
 
 // Gender balance in novel faces
 var novelF = newTrials.filter(function (t) { return t.target_gender === 'F'; }).length;
 var novelM = newTrials.filter(function (t) { return t.target_gender === 'M'; }).length;
-assertEqual(novelF, 60, 'Novel female = 60');
-assertEqual(novelM, 60, 'Novel male = 60');
+assertEqual(novelF, N_STUDY_TRIALS / 2, 'Novel female = ' + (N_STUDY_TRIALS / 2));
+assertEqual(novelM, N_STUDY_TRIALS / 2, 'Novel male = ' + (N_STUDY_TRIALS / 2));
 
-// Study trial type distribution (12 types, 10 each)
+// Study trial type distribution (12 types, N_REPLICATIONS each)
 var typeCount1 = {};
 for (var i = 0; i < d1.studyTrials.length; i++) {
   var t = d1.studyTrials[i];
@@ -238,7 +242,7 @@ for (var i = 0; i < d1.studyTrials.length; i++) {
 var typeKeys1 = Object.keys(typeCount1);
 assertEqual(typeKeys1.length, 12, 'Study has 12 trial types');
 for (var i = 0; i < typeKeys1.length; i++) {
-  assertEqual(typeCount1[typeKeys1[i]], 10, 'Type ' + typeKeys1[i] + ' has 10 reps');
+  assertEqual(typeCount1[typeKeys1[i]], N_REPLICATIONS, 'Type ' + typeKeys1[i] + ' has ' + N_REPLICATIONS + ' reps');
 }
 
 // Identity uniqueness (no model_id used in more than one role)
@@ -256,7 +260,7 @@ for (var i = 0; i < newTrials.length; i++) {
   trackId(newTrials[i].target_id, 'novel');
 }
 assertEqual(dupeCount, 0, 'No identity reuse across target/flanker/novel roles');
-assertEqual(Object.keys(usedIds).length, 360, 'Total unique faces = 360');
+assertEqual(Object.keys(usedIds).length, N_STUDY_TRIALS * 3, 'Total unique faces = ' + (N_STUDY_TRIALS * 3));
 
 // All flankers are B/W
 var nonBWFlankers = d1.studyTrials.filter(function (t) {
@@ -282,27 +286,28 @@ section('4. Condition 2 — Associative Recognition');
 CONDITION = 2;
 var d2 = allocateTrials(2);
 
-assertEqual(d2.studyTrials.length, 120, 'Study trials = 120');
-assertEqual(d2.testTrials.length,  120, 'Test trials = 120');
+assertEqual(d2.studyTrials.length, N_STUDY_TRIALS, 'Study trials = ' + N_STUDY_TRIALS);
+assertEqual(d2.testTrials.length,  N_STUDY_TRIALS, 'Test trials = ' + N_STUDY_TRIALS);
 
-var intactTrials = d2.testTrials.filter(function (t) { return t.trial_type === 'intact'; });
-var rearrangedTrials = d2.testTrials.filter(function (t) { return t.trial_type === 'rearranged'; });
-assertEqual(intactTrials.length,     60, 'Intact = 60');
-assertEqual(rearrangedTrials.length, 60, 'Rearranged = 60');
+var intactTrials = d2.testTrials.filter(function (t) { return t.pair_type === 'intact'; });
+var rearrangedTrials = d2.testTrials.filter(function (t) { return t.pair_type === 'rearranged'; });
+assertEqual(intactTrials.length + rearrangedTrials.length, N_STUDY_TRIALS, 'Intact + Rearranged = ' + N_STUDY_TRIALS);
 
-// Balanced by emotion × trial_type
+// Balanced by emotion × pair_type
 var emotionType = {};
 for (var i = 0; i < d2.testTrials.length; i++) {
   var t = d2.testTrials[i];
-  var key = t.flanker_emotion + '_' + t.trial_type;
+  var key = t.flanker_emotion + '_' + t.pair_type;
   emotionType[key] = (emotionType[key] || 0) + 1;
 }
-assertEqual(emotionType['angry_intact'],      20, 'angry intact = 20');
-assertEqual(emotionType['angry_rearranged'],  20, 'angry rearranged = 20');
-assertEqual(emotionType['happy_intact'],      20, 'happy intact = 20');
-assertEqual(emotionType['happy_rearranged'],  20, 'happy rearranged = 20');
-assertEqual(emotionType['neutral_intact'],    20, 'neutral intact = 20');
-assertEqual(emotionType['neutral_rearranged'],20, 'neutral rearranged = 20');
+// With N_REPLICATIONS reps, each emotion has 4 trial types × N_REPLICATIONS trials total
+// Split ~half intact ~half rearranged, totals per emotion should sum correctly
+var perEmotion = N_REPLICATIONS * 4; // 4 trial types per emotion (2 targ gender × 2 flank gender)
+for (var emo of ['angry', 'happy', 'neutral']) {
+  var intactN = emotionType[emo + '_intact'] || 0;
+  var rearrangedN = emotionType[emo + '_rearranged'] || 0;
+  assertEqual(intactN + rearrangedN, perEmotion, emo + ' total = ' + perEmotion);
+}
 
 // Derangement: no rearranged trial has its original flanker
 var studyPairings = {};
@@ -349,8 +354,8 @@ section('5. Condition 3 — Valence Rating');
 CONDITION = 3;
 var d3 = allocateTrials(3);
 
-assertEqual(d3.studyTrials.length, 120, 'Study trials = 120');
-assertEqual(d3.testTrials.length,  120, 'Test trials = 120');
+assertEqual(d3.studyTrials.length, N_STUDY_TRIALS, 'Study trials = ' + N_STUDY_TRIALS);
+assertEqual(d3.testTrials.length,  N_STUDY_TRIALS, 'Test trials = ' + N_STUDY_TRIALS);
 
 // All test trials should have study_flanker_emotion and study_flanker_gender
 var missingEmo = d3.testTrials.filter(function (t) { return !t.study_flanker_emotion; }).length;
@@ -400,7 +405,7 @@ assertEqual(oldMissingGender, 0, 'Old items have study_flanker_gender');
 // Associative recognition test fields
 var assocFields = ['target_id', 'target_gender', 'target_race', 'target_filename',
   'flanker_id', 'flanker_gender', 'flanker_race', 'flanker_emotion', 'flanker_filename',
-  'trial_type', 'correct_response'];
+  'pair_type', 'correct_response'];
 for (var f = 0; f < assocFields.length; f++) {
   var field = assocFields[f];
   var missing = d2.testTrials.filter(function (t) { return t[field] === undefined; }).length;

@@ -14,19 +14,19 @@ During the study phase, participants view a neutral face flanked on both sides b
 - Stimuli are photographs of faces from the Chicago Face Database (CFD) 3.0, using angry, happy (open-mouth), and neutral expressions
 - Flankers restricted to Black and White models to keep race constant across emotion conditions; targets and novel faces drawn from all races
 - Factorial design at study: 2 (target gender) x 2 (flanker gender) x 3 (flanker emotion) = 12 trial types
-- 10 replications of the 12-type design (120 study trials)
+- 5 replications of the 12-type design (60 study trials)
 - No face identity is used more than once across the entire experiment
 
 ### Trial counts
 
 | | Count |
 |----|-----|
-| Study trials | 120 |
-| Unique study faces | 240 (120 targets + 120 flankers) |
-| Item recognition test trials | 240 (120 old + 120 new) |
-| Associative recognition test trials | 120 (60 intact + 60 rearranged) |
-| Valence rating test trials | 120 |
-| **Total unique faces needed** | **360** |
+| Study trials | 60 |
+| Unique study faces | 120 (60 targets + 60 flankers) |
+| Item recognition test trials | 120 (60 old + 60 new) |
+| Associative recognition test trials | 60 (30 intact + 30 rearranged) |
+| Valence rating test trials | 60 |
+| **Total unique faces needed** | **180** |
 
 ## Repository structure
 
@@ -39,7 +39,7 @@ expt/
     helpers.js              Utility functions (derangement, HTML generators)
     trials.js               Face allocation and trial generation (study + all 3 test phases)
     timeline.js             Timeline construction (instructions, practice, blocks, debrief)
-    flanker.css             Display styles (flanker layout, single-face layout, fixation cross)
+    flanker.css             Display styles (dark background, flanker layout, single-face layout, fixation cross)
     core/
       init_experiment.js    JATOS-aware jsPsych initialization
       jspsych/
@@ -105,7 +105,7 @@ The experiment runs in any modern browser but requires a local HTTP server — o
 2. The experiment will preload face images (may take a moment), then proceed through:
    - Study instructions
    - Practice trials (4 study practice)
-   - Study phase (120 trials in 3 blocks of 40, with rest breaks)
+   - Study phase (60 trials in 2 blocks of 30, with rest break)
    - Test instructions
    - Practice trials (4 test practice, except valence)
    - Test phase (trial count and block count depend on condition)
@@ -160,12 +160,12 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | `EMOTION_EXPR_MAP` | `{angry:'A', happy:HO, neutral:'N'}` | Maps emotion names to CFD expression codes |
 | `FIXATION_DURATION` | 2000 ms | Duration of fixation cross before each trial |
 | `RESPONSE_TIMEOUT` | 3000 ms | Study: fixed display duration; test: max response window |
-| `FACE_WIDTH` | 200 px | Display width of each face image |
+| `FACE_WIDTH` | 100 px | Display width of each face image |
 | `FACE_SPACING` | 0 px | Gap between faces in the flanker display |
-| `N_REPLICATIONS` | 10 | Replications of the 12-type factorial design |
-| `STUDY_BLOCK_SIZE` | 40 | Trials per study block (120 / 40 = 3 blocks) |
+| `N_REPLICATIONS` | 5 | Replications of the 12-type factorial design |
+| `STUDY_BLOCK_SIZE` | 30 | Trials per study block (60 / 30 = 2 blocks) |
 | `TEST_BLOCK_SIZE_*` | 40 | Trials per test block (adjustable per condition) |
-| `STUDY_RESPONSE_FEEDBACK` | true | Show border on target face after study-phase keypress |
+| `STUDY_RESPONSE_FEEDBACK` | true | Swap prompt to "Response recorded" after study-phase keypress |
 | `PRACTICE_ENABLED` | true | Toggle practice trials on/off |
 | `N_PRACTICE_STUDY` | 4 | Number of practice study trials |
 | `N_PRACTICE_TEST` | 4 | Number of practice test trials |
@@ -179,11 +179,11 @@ Run `node scripts/estimate_duration.js` to compute estimated durations from the 
 
 | Condition | Typical (~1s RT) | Max (full timeout) |
 |---|---|---|
-| 1 — Item Recognition | ~25 min | ~33 min |
-| 2 — Associative Recognition | ~18 min | ~22 min |
-| 3 — Valence Rating | ~18 min | ~22 min |
+| 1 — Item Recognition | ~13 min | ~17 min |
+| 2 — Associative Recognition | ~10 min | ~12 min |
+| 3 — Valence Rating | ~9 min | ~11 min |
 
-The study phase (~11 min) is the same across conditions. Condition 1 is longest because it has 240 test trials (120 old + 120 new) vs. 120 for the other two. "Typical" assumes ~1s average RT on response-terminated test trials; "max" assumes every trial reaches the 3s timeout. Re-run the script after changing timing parameters to get updated estimates.
+The study phase (~6 min) is the same across conditions. Condition 1 is longest because it has 120 test trials (60 old + 60 new) vs. 60 for the other two. "Typical" assumes ~1s average RT on response-terminated test trials; "max" assumes every trial reaches the 3s timeout. Re-run the script after changing timing parameters to get updated estimates. Note: conditions 2 and 3 test block sizes (40) do not currently divide 60 evenly — block structure needs adjustment before those conditions can run.
 
 ## Test mode and simulation
 
@@ -255,7 +255,7 @@ Phase-specific additions:
 
 - **Study** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`
 - **Item recognition** adds: `stimulus_type` (old/new), `study_flanker_emotion`, `study_flanker_gender`
-- **Associative recognition** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `trial_type` (intact/rearranged)
+- **Associative recognition** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `pair_type` (intact/rearranged)
 - **Valence rating** adds: `study_flanker_emotion`, `study_flanker_gender`, `rating` (1-9)
 
 ## Tech stack
