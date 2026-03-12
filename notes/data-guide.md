@@ -40,6 +40,14 @@ A separate full CSV with additional bookkeeping columns (participant IDs, stimul
 | timed_out | string | True, False | all rows | Whether the participant failed to respond within the 3-second response window |
 | rating | int | 1–9 or blank | condition 3 test only | Valence rating: 1 = most negative, 5 = neutral, 9 = most positive. Blank if timed out or not a valence trial |
 
+## Full CSV Additional Columns
+
+The full CSV includes extra bookkeeping columns not present in the analysis CSV. These are useful for auditing and validation but are not needed for standard analyses.
+
+| Column | Type | Values | Description |
+|---|---|---|---|
+| device_pixel_ratio | float | e.g. 1, 1.25, 2 | Browser device pixel ratio at trial completion; changes across trials indicate the participant zoomed during the experiment |
+
 ## Experiment Design and Data Structure
 
 ### Factorial structure at study

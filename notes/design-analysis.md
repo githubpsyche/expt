@@ -199,9 +199,9 @@ Decision 4 establishes that rearranged trials recombine studied faces. Emma's "s
 
 In each case, participants could correctly classify a trial as "rearranged" without any memory for the specific identity pairing — undermining the associative recognition measure.
 
-**Resolution**: Rearrange within trial type. Each of the 12 trial types has 10 reps. Randomly assign 5 as intact and 5 as rearranged. For the 5 rearranged, shuffle flankers among those 5 targets via derangement (no flanker stays with its original target). This ensures the only detectable difference between intact and rearranged is the specific identity pairing — the design's stated goal.
+**Resolution**: Rearrange within trial type. Each rearranged trial's flanker is swapped with a flanker from a different trial of the same type via derangement (no flanker stays with its original target). This ensures the only detectable difference between intact and rearranged is the specific identity pairing — the design's stated goal.
 
-**Mechanics**: A derangement of 5 items always has solutions (44 valid permutations). This yields 12 types × 5 intact + 12 types × 5 rearranged = 60 + 60 = 120 test trials, balanced across all trial types.
+**Mechanics (5 reps)**: With 5 reps per trial type, an even split is impossible. Six trial types get 3 intact + 2 rearranged, six get 2 intact + 3 rearranged, alternating across gender combinations to balance emotions (10 intact + 10 rearranged per emotion, 30 + 30 = 60 total). See decision 31 for details.
 
 ### Stimulus constraints (from CFD audit)
 
@@ -273,22 +273,21 @@ Feedback is optional but given the silence from all sources, omit it.
 On timeout (3s expires): silent advance to next trial (fixation cross).
 No "too slow" message.
 
-**16. Response key counterbalancing: all binary tasks**
+**16. Response key counterbalancing: test-phase binary tasks only**
 
-No source mentions counterbalancing. Emma specifies fixed mappings (Z=old/same, M=new/different) for test phases, but counterbalancing all binary response keys is standard practice and was implemented for all tasks.
+No source mentions counterbalancing. Emma specifies fixed mappings (Z=old/same, M=new/different) for test phases.
 
-A single `KEY_MAPPING` variable (1 or 2) controls all binary key assignments:
-- **Key mapping 1**: Z=female/old/same, M=male/new/different
-- **Key mapping 2**: Z=male/new/different, M=female/old/same
+A single `KEY_MAPPING` variable (1 or 2) controls **test-phase** binary key assignments:
+- **Key mapping 1**: Z=old/same, M=new/different
+- **Key mapping 2**: Z=new/different, M=old/same
 
-This counterbalances study-phase gender mapping (M=male creates an asymmetric SRC effect) and test-phase recognition keys alike. Assigned via URL parameter (`key_mapping=1|2`), JATOS JSON input, or random 50/50 fallback. Recorded in data as `key_mapping`.
+Study-phase keys are fixed (see decision 17). `KEY_MAPPING` is assigned via URL parameter (`key_mapping=1|2`), JATOS JSON input, or random 50/50 fallback. Recorded in data as `key_mapping`.
 
-**17. Study phase response keys: Z and M, counterbalanced**
+**17. Study phase response keys: Z and M, fixed (Z=female, M=male)**
 
 No source specifies study phase keys.
 Emma only specifies test phase keys (Z/M).
-Using Z and M for consistency with test phase key positions (left/right mapping maintained throughout).
-Gender-to-key assignment is counterbalanced across participants (see decision 16).
+Study keys are fixed: Z=female, M=male. The M=male mnemonic makes the mapping intuitive and eliminates the SRC confound that would arise from counterbalancing (M=male is naturally compatible). Originally counterbalanced via `KEY_MAPPING`, but fixed after pilot testing showed low study accuracy (72.5% in the 8-subject pilot) and participant confusion — two participants reported the key mapping felt reversed (see decision 37).
 
 **18. Novel faces for item recognition: 50/50 gender match**
 
@@ -339,7 +338,7 @@ HO (open-mouth grin) chosen over HC (closed-mouth smile). More intense and a clo
 
 **26. Associative rearrangement: within trial type**
 
-Rearranged trials preserve target gender, flanker gender, and flanker emotion — only the specific identity pairing changes. 5 intact + 5 rearranged per trial type (10 reps each). See rearrangement constraints for analysis.
+Rearranged trials preserve target gender, flanker gender, and flanker emotion — only the specific identity pairing changes. With 5 reps per trial type, the intact/rearranged split alternates across types to achieve 30/30 overall (see decision 31). See rearrangement constraints section for rationale.
 
 **27. Data output fields**
 
@@ -376,8 +375,32 @@ Reduced `N_REPLICATIONS` from 10 to 5 and `STUDY_BLOCK_SIZE` from 40 to 30 (60 /
 **Downstream effects by condition:**
 
 - **Condition 1 (item recognition)**: 60 old + 60 new = 120 test trials, 20 old per emotion. Sufficient for per-emotion d' with standard edge correction.
-- **Condition 2 (associative recognition)**: 60 study → 30 intact + 30 rearranged. Per trial type (12 types, 5 reps): only 2-3 per split. `derangement(2)` is a trivial swap; `derangement(3)` has only 2 possible permutations. **Rearrangement logic needs rework before condition 2 can be piloted.** Additionally, `TEST_BLOCK_SIZE_ASSOC_RECOG` (40) does not divide 60 evenly.
-- **Condition 3 (valence)**: 60 study → 60 test → 20 ratings per emotion. Workable for mean ratings. `TEST_BLOCK_SIZE_VALENCE` (40) does not divide 60 evenly.
+- **Condition 2 (associative recognition)**: 60 study → 30 intact + 30 rearranged. With 5 reps per trial type, a naive `ceil(5/2)` split would give 36/24. Fixed by alternating which of the 12 trial types get majority-intact (3/2) vs majority-rearranged (2/3), balanced across emotions (10 intact + 10 rearranged per emotion). `derangement(2)` is a trivial swap and `derangement(3)` has only 2 possible permutations, but which items are assigned to rearranged is random, so the resulting pairs are unpredictable. `TEST_BLOCK_SIZE_ASSOC_RECOG` set to 30 (60 / 30 = 2 blocks).
+- **Condition 3 (valence)**: 60 study → 60 test → 20 ratings per emotion. Workable for mean ratings. `TEST_BLOCK_SIZE_VALENCE` set to 30 (60 / 30 = 2 blocks).
+
+**32. Face cropping: CSS crop to 50% width**
+
+CFD face images include shoulders, background, and hair that are not relevant to the task. At small display sizes (100px, decision 20), these non-face elements consume a disproportionate fraction of the image area. `FACE_CROP` (config.js, default 0.5) controls how much of the original image width is shown using CSS `object-fit: cover` with `object-position: center 20%`. The 20% vertical offset focuses the crop on the face rather than the forehead. Display height is computed as `FACE_WIDTH * (281/400) / FACE_CROP`, preserving the CFD aspect ratio (400×281) within the cropped viewport.
+
+**33. Key quiz after instructions**
+
+After study-phase and test-phase instructions (except valence, which uses number keys), participants complete a key-mapping quiz. Each quiz item displays a label (e.g., "female", "old") and the participant must press the correct key. Incorrect responses trigger feedback and the item repeats until correct. This ensures participants have learned the mapping before trials begin. Added after the 8-subject pilot showed 72.5% study accuracy, partly attributable to key confusion (one participant at 5% accuracy, consistent with reversed keys).
+
+**34. Removed on-screen trial prompts**
+
+On-screen key reminders (e.g., "Z = female | M = male") were originally displayed below the stimulus on every trial. Removed from all real trials per E.C. feedback: "We usually do that" (referring to the standard practice of not showing key reminders during trials). The key quiz (decision 33) and practice-phase prompts (decision 35) compensate for the removal.
+
+**35. Practice-only prompts**
+
+Practice trials retain on-screen key reminders below the stimulus to help participants learn the mapping. Real trials do not show prompts (decision 34). At the end of the practice phase, a notice warns participants: "From now on, the key instructions will **not** be displayed on screen during trials." This transitions participants from prompted practice to unprompted real trials.
+
+**36. Rest break key reminders**
+
+Rest breaks between blocks include a reminder of the current key mapping (e.g., "Reminder: Z = female, M = male"). This compensates for the removal of on-screen trial prompts (decision 34) and gives participants a chance to re-check the mapping if needed without adding visual clutter to trial displays.
+
+**37. Participant feedback: key confusion (March 2, 2026 pilot)**
+
+Two Prolific participants reported that the instructions displayed Z=male and M=female (reversed from the correct mapping Z=female, M=male). Investigation confirmed that the instruction text in code was correct. The fix was applied in the same batch of uncommitted changes that included decisions 33-36 (key quiz, prompt removal, practice prompts, rest break reminders). The fixed study key mapping (decision 17, M=male mnemonic) and the key quiz (decision 33) together address the underlying confusion.
 
 ### Research Questions and Output Fields
 
@@ -464,19 +487,19 @@ Each test phase addresses a distinct question about how emotional flankers at st
 
 -   **Display**: Three face photographs in a horizontal row — neutral center target, identical emotional flankers on both sides
 -   **Stimuli**: 2 unique face identities per trial (1 neutral target, 1 emotional flanker repeated on both sides)
--   **Task**: Gender judgment on center face (Z=female, M=male)
+-   **Task**: Gender judgment on center face (Z=female, M=male; fixed mapping — see decision 17)
 
 ### Test Phase 1: Item Recognition
 
 -   **Display**: Single neutral face photograph
 -   **Stimuli**: All studied neutral targets + equal number of novel neutral faces (50/50 gender-matched)
--   **Task**: Old/new judgment (Z=old, M=new)
+-   **Task**: Old/new judgment (key mapping counterbalanced — see decision 16)
 
 ### Test Phase 2: Associative Recognition
 
 -   **Display**: Three face photographs in a horizontal row (same layout as study)
 -   **Stimuli**: All studied target-flanker combinations; half intact (same pairing as study), half rearranged within trial type (target gender, flanker gender, and flanker emotion preserved; only specific identity pairing changes)
--   **Task**: Same/different judgment (Z=same, M=different)
+-   **Task**: Same/different judgment (key mapping counterbalanced — see decision 16)
 
 ### Test Phase 3: Valence Rating
 
@@ -486,14 +509,18 @@ Each test phase addresses a distinct question about how emotional flankers at st
 
 ### Other Screens
 
--   **Instructions**: Before study phase and before test phase, with response key reminders
+-   **Instructions**: Before study phase and before test phase, with response key descriptions
+-   **Key quiz**: After instructions for study and test phases (except valence), participant must press correct key for each label; incorrect responses repeat with feedback (decision 33)
+-   **Practice**: 4 study + 4 test practice trials (except valence, which has no test practice) using non-experimental stimuli; practice trials show on-screen key prompts (decision 35)
+-   **Practice-end notice**: Warns that key instructions will not be displayed during real trials (decision 35)
+-   **Rest breaks**: Between blocks, with key mapping reminder text (decision 36)
 -   **Debrief**: Placeholder screen at end (researcher provides text)
 
 ### Data Output
 
 Per-trial fields recorded by the experiment:
 
--   **All trials**: `condition`, `phase`, `block`, `trial_index`, `target_id`, `target_gender`, `target_race`, `target_filename`, `response`, `rt`, `timed_out`, `correct_response`, `correct`
+-   **All trials**: `condition`, `key_mapping`, `phase`, `block`, `trial_index`, `target_id`, `target_gender`, `target_race`, `target_filename`, `response`, `rt`, `timed_out`, `correct_response`, `correct`, `device_pixel_ratio`
 -   **Study** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`
 -   **Item recognition** adds: `stimulus_type`, `study_flanker_emotion`, `study_flanker_gender`
 -   **Associative recognition** adds: `flanker_id`, `flanker_gender`, `flanker_race`, `flanker_emotion`, `flanker_filename`, `pair_type`
@@ -506,8 +533,12 @@ Per-trial fields recorded by the experiment:
 | Experiment condition | — | 1 (item recog), 2 (assoc recog), or 3 (valence) |
 | Number of replications | 5 | Reduced from 10 per decision 31; 20 not feasible (decision 23) |
 | Study block size | 30 | 60 / 30 = 2 blocks |
-| Practice trials | on | Boolean; if on, 4-8 practice trials before study and test using non-experimental stimuli |
+| Test block size (item recog) | 40 | 120 / 40 = 3 blocks |
+| Test block size (assoc recog) | 30 | 60 / 30 = 2 blocks |
+| Test block size (valence) | 30 | 60 / 30 = 2 blocks |
+| Practice trials | on | Boolean; if on, 4 practice trials before study and test (except valence test) |
 | Face display width | 100px | Reduced from 400px → 200px → 100px per Logan feedback (decision 20) |
+| Face crop | 0.5 | Fraction of original image width shown; CSS object-fit crop (decision 32) |
 | Face spacing | 0px | Flanker edges adjacent to target |
 
 ------------------------------------------------------------------------

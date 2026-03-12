@@ -292,6 +292,8 @@ assertEqual(d2.testTrials.length,  N_STUDY_TRIALS, 'Test trials = ' + N_STUDY_TR
 var intactTrials = d2.testTrials.filter(function (t) { return t.pair_type === 'intact'; });
 var rearrangedTrials = d2.testTrials.filter(function (t) { return t.pair_type === 'rearranged'; });
 assertEqual(intactTrials.length + rearrangedTrials.length, N_STUDY_TRIALS, 'Intact + Rearranged = ' + N_STUDY_TRIALS);
+assertEqual(intactTrials.length, N_STUDY_TRIALS / 2, 'Exactly ' + (N_STUDY_TRIALS / 2) + ' intact trials');
+assertEqual(rearrangedTrials.length, N_STUDY_TRIALS / 2, 'Exactly ' + (N_STUDY_TRIALS / 2) + ' rearranged trials');
 
 // Balanced by emotion × pair_type
 var emotionType = {};
@@ -303,10 +305,13 @@ for (var i = 0; i < d2.testTrials.length; i++) {
 // With N_REPLICATIONS reps, each emotion has 4 trial types × N_REPLICATIONS trials total
 // Split ~half intact ~half rearranged, totals per emotion should sum correctly
 var perEmotion = N_REPLICATIONS * 4; // 4 trial types per emotion (2 targ gender × 2 flank gender)
+var perEmotionHalf = perEmotion / 2;
 for (var emo of ['angry', 'happy', 'neutral']) {
   var intactN = emotionType[emo + '_intact'] || 0;
   var rearrangedN = emotionType[emo + '_rearranged'] || 0;
   assertEqual(intactN + rearrangedN, perEmotion, emo + ' total = ' + perEmotion);
+  assertEqual(intactN, perEmotionHalf, emo + ' intact = ' + perEmotionHalf);
+  assertEqual(rearrangedN, perEmotionHalf, emo + ' rearranged = ' + perEmotionHalf);
 }
 
 // Derangement: no rearranged trial has its original flanker

@@ -77,7 +77,7 @@ function allocateTrials(condition) {
   var practiceTestTrials = [];
   if (PRACTICE_ENABLED) {
     practiceStudyTrials = buildPracticeStudyTrials(practiceTargets, practiceFlankers);
-    practiceTestTrials = buildPracticeTestTrials(practiceTargets, condition);
+    practiceTestTrials = buildPracticeTestTrials(practiceTargets, practiceFlankers, condition);
   }
 
   // --- Collect preload paths ---
@@ -241,12 +241,22 @@ function buildAssocRecogTrials(studyTrials) {
     byType[key].push(st);
   }
 
+  // With 5 reps per type and 12 types, a naive ceil(5/2) split gives 36/24.
+  // Alternate which types get majority-intact (3/2) vs majority-rearranged (2/3)
+  // to achieve exactly 30 intact + 30 rearranged, balanced across emotions.
+  var majorityIntact = {
+    'F_F_angry': true,  'F_F_neutral': true,
+    'F_M_happy': true,
+    'M_F_angry': true,  'M_F_neutral': true,
+    'M_M_happy': true
+  };
+
   var trials = [];
 
   var keys = Object.keys(byType);
   for (var k = 0; k < keys.length; k++) {
     var group = jsPsych.randomization.shuffle(byType[keys[k]].slice());
-    var nIntact     = Math.ceil(group.length / 2);
+    var nIntact     = majorityIntact[keys[k]] ? 3 : 2;
     var nRearranged = group.length - nIntact;
     var intactGroup     = group.slice(0, nIntact);
     var rearrangedGroup = group.slice(nIntact);
@@ -340,7 +350,7 @@ function buildPracticeStudyTrials(practiceTargets, practiceFlankers) {
   return trials;
 }
 
-function buildPracticeTestTrials(practiceTargets, condition) {
+function buildPracticeTestTrials(practiceTargets, practiceFlankers, condition) {
   var tAll = practiceTargets.F.concat(practiceTargets.M);
   var trials = [];
 
@@ -372,17 +382,18 @@ function buildPracticeTestTrials(practiceTargets, condition) {
     }
   } else if (condition === 2) {
     // 4 practice assoc trials (all "intact" for simplicity)
+    var fAll = practiceFlankers.F.concat(practiceFlankers.M);
     for (var i = 0; i < tAll.length; i++) {
       trials.push({
         target_id:        tAll[i].model_id,
         target_gender:    tAll[i].gender,
         target_race:      tAll[i].race,
         target_filename:  tAll[i].filename,
-        flanker_id:       null,
-        flanker_gender:   null,
-        flanker_race:     null,
+        flanker_id:       fAll[i].model_id,
+        flanker_gender:   fAll[i].gender,
+        flanker_race:     fAll[i].race,
         flanker_emotion:  'neutral',
-        flanker_filename: null,
+        flanker_filename: fAll[i].filename,
         pair_type:       'intact',
         correct_response: ASSOC_RECOG_KEYS.same
       });

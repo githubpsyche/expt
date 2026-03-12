@@ -11,6 +11,7 @@ var RESPONSE_TIMEOUT  = 3000; // study: fixed display duration; test: max respon
 // --- Display (px) ---
 var FACE_WIDTH   = 100; // width of each face image (study flanker display + test single face)
 var FACE_SPACING = 0;   // horizontal gap between faces in the 3-face flanker display
+var FACE_CROP    = 0.5; // fraction of original image width to show (0–1); lower = tighter crop around face
 
 // --- Stimulus decisions ---
 var HAPPY_EXPRESSION = 'HO';          // 'HC' (closed mouth) or 'HO' (open mouth)
@@ -25,13 +26,13 @@ var EMOTION_EXPR_MAP = {              // maps emotion names to CFD expression co
 // --- Study phase ---
 var N_REPLICATIONS  = 5;   // repetitions per trial type (each uses a unique face pair)
 var N_TRIAL_TYPES   = 12;  // 2 target genders x 2 flanker genders x 3 flanker emotions
-var N_STUDY_TRIALS  = N_REPLICATIONS * N_TRIAL_TYPES;  // 120
+var N_STUDY_TRIALS  = N_REPLICATIONS * N_TRIAL_TYPES;  // 60
 
 // --- Block sizes (must divide phase totals evenly) ---
 var STUDY_BLOCK_SIZE            = 30;  // 60 / 30 = 2 blocks
-var TEST_BLOCK_SIZE_ITEM_RECOG  = 40;  // 240 / 40 = 6 blocks
-var TEST_BLOCK_SIZE_ASSOC_RECOG = 40;  // 120 / 40 = 3 blocks
-var TEST_BLOCK_SIZE_VALENCE     = 40;  // 120 / 40 = 3 blocks
+var TEST_BLOCK_SIZE_ITEM_RECOG  = 40;  // 120 / 40 = 3 blocks
+var TEST_BLOCK_SIZE_ASSOC_RECOG = 30;  // 60 / 30 = 2 blocks
+var TEST_BLOCK_SIZE_VALENCE     = 30;  // 60 / 30 = 2 blocks
 
 // --- Study-phase response feedback ---
 var STUDY_RESPONSE_FEEDBACK = true;  // swap prompt to "Response recorded" after study-phase keypress
@@ -76,15 +77,14 @@ function initURLParams() {
   var urlCondition = parseInt(getParam('condition'));
   CONDITION = ([1, 2, 3].indexOf(urlCondition) !== -1) ? urlCondition : null;
 
-  // --- Key-mapping counterbalance (1 or 2), controls all binary tasks ---
-  //   1 = left=female/old/same, right=male/new/different
-  //   2 = left=male/new/different, right=female/old/same
+  // --- Key-mapping counterbalance (1 or 2), controls test-phase tasks ---
+  //   1 = left=old/same, right=new/different
+  //   2 = left=new/different, right=old/same
+  // Study keys are fixed: Z=female, M=male (mnemonic: M for male).
   var urlMapping = parseInt(getParam('key_mapping'));
   KEY_MAPPING = ([1, 2].indexOf(urlMapping) !== -1) ? urlMapping : (Math.random() < 0.5 ? 1 : 2);
 
-  STUDY_KEYS = (KEY_MAPPING === 1)
-    ? { female: RESPONSE_KEY_LEFT,  male: RESPONSE_KEY_RIGHT }
-    : { female: RESPONSE_KEY_RIGHT, male: RESPONSE_KEY_LEFT };
+  STUDY_KEYS = { female: RESPONSE_KEY_LEFT, male: RESPONSE_KEY_RIGHT };
 
   ITEM_RECOG_KEYS = (KEY_MAPPING === 1)
     ? { old: RESPONSE_KEY_LEFT,  new: RESPONSE_KEY_RIGHT }
@@ -117,4 +117,62 @@ function initURLParams() {
     study_id:    STUDY_ID,
     session_id:  SESSION_ID
   });
+
+  // --- Validate key mappings at startup ---
+  validateKeyMappings();
+}
+
+// ============================================================
+// Centralized key-label lookup
+// ============================================================
+
+/**
+ * Derive display labels for left/right keys from the actual key objects.
+ * This is the ONLY place labels should be read — never hard-code them elsewhere.
+ * @param {string} phase - 'study' or 'test'
+ * @param {number|null} condition - 1, 2, 3, or null (for study phase)
+ * @returns {{ left: string, right: string }|null} label names, or null for valence
+ */
+function getKeyLabels(phase, condition) {
+  var map;
+  if (phase === 'study') {
+    map = STUDY_KEYS;
+  } else if (condition === 1) {
+    map = ITEM_RECOG_KEYS;
+  } else if (condition === 2) {
+    map = ASSOC_RECOG_KEYS;
+  } else {
+    return null;
+  }
+  var leftLabel = null, rightLabel = null;
+  var labels = Object.keys(map);
+  for (var i = 0; i < labels.length; i++) {
+    if (map[labels[i]] === RESPONSE_KEY_LEFT)  leftLabel  = labels[i];
+    if (map[labels[i]] === RESPONSE_KEY_RIGHT) rightLabel = labels[i];
+  }
+  return { left: leftLabel, right: rightLabel };
+}
+
+/**
+ * Validate that all key mappings are internally consistent.
+ * Called once at the end of initURLParams(). Throws on failure.
+ */
+function validateKeyMappings() {
+  var checks = [
+    { phase: 'study', condition: null },
+    { phase: 'test',  condition: 1 },
+    { phase: 'test',  condition: 2 }
+  ];
+  for (var i = 0; i < checks.length; i++) {
+    var labels = getKeyLabels(checks[i].phase, checks[i].condition);
+    if (!labels) continue;
+    if (!labels.left || !labels.right) {
+      throw new Error('Key mapping validation failed: missing label for ' +
+        checks[i].phase + '/condition ' + checks[i].condition);
+    }
+    if (labels.left === labels.right) {
+      throw new Error('Key mapping validation failed: duplicate labels for ' +
+        checks[i].phase + '/condition ' + checks[i].condition);
+    }
+  }
 }

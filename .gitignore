@@ -189,3 +189,4 @@ data/simulated/
 # Extras
 .vscode/
 .claude/
+.token

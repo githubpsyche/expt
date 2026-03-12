@@ -52,6 +52,7 @@ EXTRA_COLUMNS = [
     "flanker_id",
     "flanker_filename",
     "correct_response",
+    "device_pixel_ratio",
 ]
 
 FULL_COLUMNS = ANALYSIS_COLUMNS + EXTRA_COLUMNS
@@ -165,6 +166,7 @@ def process_participant(events, subject_number):
             "flanker_id": event.get("flanker_id") or "",
             "flanker_filename": event.get("flanker_filename") or "",
             "correct_response": event.get("correct_response") if event.get("correct_response") is not None else "",
+            "device_pixel_ratio": event.get("device_pixel_ratio", ""),
         }
         rows.append(row)
 

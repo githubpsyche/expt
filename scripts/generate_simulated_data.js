@@ -72,9 +72,7 @@ function simulateResponse(trial, phase, condition, keyMapping, blockNum) {
 
     if (phase === 'study') {
       // Gender judgment: choose between the two study keys
-      var studyKeys = (keyMapping === 1)
-        ? { female: 'z', male: 'm' }
-        : { female: 'm', male: 'z' };
+      var studyKeys = { female: 'z', male: 'm' };
       trial.response = randomChoice([studyKeys.female, studyKeys.male]);
       trial.correct_response = (trial.target_gender === 'F')
         ? studyKeys.female : studyKeys.male;
@@ -138,9 +136,7 @@ for (var ci = 0; ci < conditions.length; ci++) {
     KEY_MAPPING = km;
 
     // Recompute derived key objects
-    STUDY_KEYS = (km === 1)
-      ? { female: 'z', male: 'm' }
-      : { female: 'm', male: 'z' };
+    STUDY_KEYS = { female: 'z', male: 'm' };
     ITEM_RECOG_KEYS = (km === 1)
       ? { old: 'z', new: 'm' }
       : { old: 'm', new: 'z' };

@@ -53,12 +53,12 @@ expt/
     resize_images.py        Resizes CFD images to 400px display width
     generate_simulated_data.js  Generates simulated JSONL data for all conditions
     estimate_duration.js    Computes estimated experiment duration from config.js
-    run_tests.js            Verification test suite (182 tests)
+    run_tests.js            Verification test suite (178 tests)
     test_analyses.py        Python analysis pipeline tests (signal detection, ANOVA)
   data/
     simulated/              Generated JSONL files (not committed)
   notes/
-    design-analysis.md      Authoritative design specification (27 decisions, full rationale)
+    design-analysis.md      Authoritative design specification (37 decisions, full rationale)
 ```
 
 ## Design analysis
@@ -66,11 +66,11 @@ expt/
 The full design specification lives in [`notes/design-analysis.md`](notes/design-analysis.md). It contains:
 
 - **Source emails** from the student and advisor, quoted verbatim
-- **27 numbered design decisions** with rationale for each, organized into:
+- **37 numbered design decisions** with rationale for each, organized into:
   - Decisions from source emails (1-12)
   - Rearrangement constraints analysis for associative recognition
   - Stimulus constraints from CFD audit (decisions 23-25), including expression availability tables and face budget
-  - Developer decisions (13-22, 24-27)
+  - Developer decisions (13-22, 24-37)
 - **Research questions and output fields** with per-RQ analysis traces through the data fields
 - **Consolidated design specification** — a compact reference for all phases, data output, and configurable parameters
 - **Trial count summary**
@@ -151,7 +151,7 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | Parameter | Default | Notes |
 |-----------|---------|-------|
 | `CONDITION` | (required) | 1 = item recog, 2 = assoc recog, 3 = valence; set via `?condition=` URL param |
-| `KEY_MAPPING` | random | 1 or 2; counterbalances all binary response keys; set via `?key_mapping=` or random |
+| `KEY_MAPPING` | random | 1 or 2; counterbalances test-phase binary response keys (study keys are fixed: Z=female, M=male); set via `?key_mapping=` or random |
 | `RESPONSE_KEY_LEFT` | `'z'` | Left response key for all binary tasks |
 | `RESPONSE_KEY_RIGHT` | `'m'` | Right response key for all binary tasks |
 | `HAPPY_EXPRESSION` | `'HO'` | `'HC'` (closed mouth) or `'HO'` (open mouth); single-knob switch |
@@ -161,17 +161,20 @@ All parameters are in [`experiment/config.js`](experiment/config.js):
 | `FIXATION_DURATION` | 2000 ms | Duration of fixation cross before each trial |
 | `RESPONSE_TIMEOUT` | 3000 ms | Study: fixed display duration; test: max response window |
 | `FACE_WIDTH` | 100 px | Display width of each face image |
+| `FACE_CROP` | 0.5 | Fraction of original image width shown; CSS object-fit crop |
 | `FACE_SPACING` | 0 px | Gap between faces in the flanker display |
 | `N_REPLICATIONS` | 5 | Replications of the 12-type factorial design |
 | `STUDY_BLOCK_SIZE` | 30 | Trials per study block (60 / 30 = 2 blocks) |
-| `TEST_BLOCK_SIZE_*` | 40 | Trials per test block (adjustable per condition) |
+| `TEST_BLOCK_SIZE_ITEM_RECOG` | 40 | Trials per item recog test block (120 / 40 = 3 blocks) |
+| `TEST_BLOCK_SIZE_ASSOC_RECOG` | 30 | Trials per assoc recog test block (60 / 30 = 2 blocks) |
+| `TEST_BLOCK_SIZE_VALENCE` | 30 | Trials per valence test block (60 / 30 = 2 blocks) |
 | `STUDY_RESPONSE_FEEDBACK` | true | Swap prompt to "Response recorded" after study-phase keypress |
 | `PRACTICE_ENABLED` | true | Toggle practice trials on/off |
 | `N_PRACTICE_STUDY` | 4 | Number of practice study trials |
 | `N_PRACTICE_TEST` | 4 | Number of practice test trials |
 | `VALENCE_KEYS` | 1-9 | Number row keys for valence rating |
 
-Key mapping 1 = left=female/old/same, right=male/new/different. Key mapping 2 reverses this.
+Study keys are fixed: Z=female, M=male (all key mappings). Test keys: mapping 1 = Z=old/same, M=new/different; mapping 2 reverses this.
 
 ## Estimated duration
 
@@ -183,7 +186,7 @@ Run `node scripts/estimate_duration.js` to compute estimated durations from the 
 | 2 — Associative Recognition | ~10 min | ~12 min |
 | 3 — Valence Rating | ~9 min | ~11 min |
 
-The study phase (~6 min) is the same across conditions. Condition 1 is longest because it has 120 test trials (60 old + 60 new) vs. 60 for the other two. "Typical" assumes ~1s average RT on response-terminated test trials; "max" assumes every trial reaches the 3s timeout. Re-run the script after changing timing parameters to get updated estimates. Note: conditions 2 and 3 test block sizes (40) do not currently divide 60 evenly — block structure needs adjustment before those conditions can run.
+The study phase (~6 min) is the same across conditions. Condition 1 is longest because it has 120 test trials (60 old + 60 new) vs. 60 for the other two. "Typical" assumes ~1s average RT on response-terminated test trials; "max" assumes every trial reaches the 3s timeout. Re-run the script after changing timing parameters to get updated estimates.
 
 ## Test mode and simulation
 
@@ -221,13 +224,13 @@ The manifest is a complete inventory of available expressions; the experiment se
 node scripts/run_tests.js
 ```
 
-The test suite ([`scripts/run_tests.js`](scripts/run_tests.js)) runs 182 tests covering:
+The test suite ([`scripts/run_tests.js`](scripts/run_tests.js)) runs 178 tests covering:
 
 1. **Stimulus manifest** — model counts by race/gender match the CFD audit (597 models), expression availability for B/W models, file-exists checks for image paths
 2. **Helper functions** — derangement correctness (50 iterations, no fixed points), array chunking, HTML display generators
-3. **Condition 1 (item recognition)** — 120 study + 240 test trials, old/new split, gender balance, 12 trial types x 10 reps, identity uniqueness across 360 faces, B/W flanker constraint, practice face disjointness
-4. **Condition 2 (associative recognition)** — 60 intact + 60 rearranged, balanced by emotion x trial type, zero derangement fixed points, all 3 study factors preserved in rearranged trials, intact pairings match study
-5. **Condition 3 (valence rating)** — 120 test with `study_flanker_emotion`/`study_flanker_gender`, null `correct_response`, no practice test trials
+3. **Condition 1 (item recognition)** — 60 study + 120 test trials, old/new split, gender balance, 12 trial types x 5 reps, identity uniqueness across 180 faces, B/W flanker constraint, practice face disjointness
+4. **Condition 2 (associative recognition)** — 30 intact + 30 rearranged, balanced by emotion x trial type, zero derangement fixed points, all 3 study factors preserved in rearranged trials, intact pairings match study
+5. **Condition 3 (valence rating)** — 60 test with `study_flanker_emotion`/`study_flanker_gender`, null `correct_response`, no practice test trials
 6. **Data field completeness** — every field specified in design decision 27 is present on every trial for each phase
 7. **Preload paths** — all image paths in the preload list are valid (URL format or files on disk)
 

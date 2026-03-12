@@ -75,8 +75,8 @@ for cond in [1, 2, 3]:
 
 section("1. Data integrity")
 
-EXPECTED_STUDY = 120
-EXPECTED_TEST = {1: 240, 2: 120, 3: 120}
+EXPECTED_STUDY = 60
+EXPECTED_TEST = {1: 120, 2: 60, 3: 60}
 
 COMMON_FIELDS = [
     "condition",
@@ -118,7 +118,7 @@ ASSOC_RECOG_FIELDS = COMMON_FIELDS + [
     "flanker_race",
     "flanker_emotion",
     "flanker_filename",
-    "trial_type",
+    "pair_type",
 ]
 
 VALENCE_FIELDS = COMMON_FIELDS + [
@@ -250,13 +250,13 @@ for km in [1, 2]:
     responded = test[~test["timed_out"]]
 
     # Hit rate: intact trials responding "same", by emotion
-    intact = responded[responded["trial_type"] == "intact"]
+    intact = responded[responded["pair_type"] == "intact"]
     hits_by_emo = intact.groupby("flanker_emotion").apply(
         lambda g: (g["response"] == same_key).mean()
     )
 
     # FA rate: rearranged trials responding "same", by emotion
-    rearranged = responded[responded["trial_type"] == "rearranged"]
+    rearranged = responded[responded["pair_type"] == "rearranged"]
     fa_by_emo = rearranged.groupby("flanker_emotion").apply(
         lambda g: (g["response"] == same_key).mean()
     )
